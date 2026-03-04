@@ -1,19 +1,21 @@
-// firebase.js (SDK modular via CDN)
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCcLU_s0knSY6SN5erdzLZzpI3JsdS7AT4",
-  authDomain: "catecismo-b412c.firebaseapp.com",
-  projectId: "catecismo-b412c",
-  storageBucket: "catecismo-b412c.firebasestorage.app",
-  messagingSenderId: "537505326579",
-  appId: "1:537505326579:web:30e05237bbdd8303f39e86",
-  measurementId: "G-WYFBKTHB6D"
+  apiKey: "AIzaSyCXkQPRRGrYa0bHrvK4KICRgMopeNkZMPw",
+  authDomain: "catecismo-9565d.firebaseapp.com",
+  projectId: "catecismo-9565d",
+  storageBucket: "catecismo-9565d.firebasestorage.app",
+  messagingSenderId: "706368409154",
+  appId: "1:706368409154:web:8f577fb195e839644967db",
+  measurementId: "G-1Y3JSRPLKM"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-export { db };
+const analytics = getAnalytics(app);

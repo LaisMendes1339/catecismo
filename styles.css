@@ -373,4 +373,30 @@ textarea{ min-height: 160px; resize: vertical; }
   .page{ display: none; }
   .page:target{ display: flex; flex-direction: column; gap: 18px; }
   .page.isDefault{ display: flex; flex-direction: column; gap: 18px; }
+
+}
+
+.registroHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+}
+
+.registroToggle{
+  font-size:18px;
+  transition:transform .2s ease;
+}
+
+.registro.open .registroToggle{
+  transform:rotate(180deg);
+}
+
+.registroConteudo{
+  display:none;
+  margin-top:10px;
+}
+
+.registro.open .registroConteudo{
+  display:block;
 }

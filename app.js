@@ -1,12 +1,11 @@
-// app.js (module) — versão completa com:
+// app.js (module) — versão completa atualizada
 // ✅ Navegação por hash + :target
-// ✅ Firestore realtime (onSnapshot) com status "Online/Erro/Offline"
-// ✅ Toast com erro real
+// ✅ Firestore realtime
 // ✅ CRUD em todas as abas
-// ✅ Após salvar: limpa formulário e foca no próximo campo
-// ✅ Comentários/Respostas: salva e libera preencher de novo
+// ✅ Formulários limpam após salvar
+// ✅ Comentários e respostas funcionais
 // ✅ Exportar PDF
-// ✅ Registros com accordion premium (preview + ler mais + animação)
+// ✅ Accordion premium sem duplicar informação em nenhuma aba
 
 import { db } from "./firebase.js";
 import {
@@ -34,7 +33,7 @@ function toast(msg){
   el.textContent = msg;
   el.style.display = "block";
   clearTimeout(toast._t);
-  toast._t = setTimeout(()=> el.style.display="none", 2600);
+  toast._t = setTimeout(()=> el.style.display = "none", 2600);
 }
 
 function esc(str){
@@ -45,7 +44,7 @@ function esc(str){
 
 function isoToday(){
   const d = new Date();
-  const pad = (n)=> String(n).padStart(2,"0");
+  const pad = (n)=> String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
 
@@ -80,7 +79,7 @@ const cache = {
   turma: []
 };
 
-const selected = { inicio:null, evangelho:null, vida:null, missao:null };
+const selected = { inicio: null, evangelho: null, vida: null, missao: null };
 
 /* ========= Navegação ========= */
 const navItems = Array.from(document.querySelectorAll("#nav .navItem"));
@@ -98,7 +97,7 @@ const subtitles = {
 };
 
 function currentPageKey(){
-  const k = (location.hash || "#inicio").replace("#","");
+  const k = (location.hash || "#inicio").replace("#", "");
   return k || "inicio";
 }
 
@@ -109,13 +108,14 @@ function applyNavState(){
 
   const active = navItems.find(a => a.dataset.page === key);
   const title = active?.querySelector(".navTitle")?.textContent?.trim() || "Catequese";
+
   if(pageTitle) pageTitle.textContent = title;
   if(pageSubtitle) pageSubtitle.textContent = subtitles[key] || "";
 
   document.querySelectorAll(".page").forEach(p => p.classList.remove("isDefault"));
 
   const hasHash = !!location.hash && location.hash.length > 1;
-  const targetId = hasHash ? location.hash.replace("#","") : "";
+  const targetId = hasHash ? location.hash.replace("#", "") : "";
   const targetExists = targetId ? document.getElementById(targetId) : null;
 
   if(!hasHash || !targetExists){
@@ -153,9 +153,7 @@ async function patchArrayField(col, id, fieldName, nextArray){
   await updateDocById(col, id, { [fieldName]: nextArray });
 }
 
-/* ========= Realtime sync ========= */
-let firstSync = true;
-
+/* ========= Sync ========= */
 function subscribeAll(){
   setSync("Sincronizando…");
 
@@ -163,18 +161,17 @@ function subscribeAll(){
   let okCount = 0;
 
   keys.forEach((key)=>{
-    const qy = query(collection(db, COL[key]), orderBy("createdAt","desc"));
+    const qy = query(collection(db, COL[key]), orderBy("createdAt", "desc"));
 
     onSnapshot(
       qy,
       (snap)=>{
-        cache[key] = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        cache[key] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         updateProgressUI();
 
         okCount++;
         if(okCount >= 1){
           setSync("Online ✅");
-          firstSync = false;
         }
 
         const current = currentPageKey();
@@ -185,7 +182,6 @@ function subscribeAll(){
         const msg = err?.code ? `${err.code}` : "erro";
         setSync(`Erro 🔴 (${msg})`);
         toast(`Falha no Firestore: ${msg}`);
-        firstSync = false;
       }
     );
   });
@@ -212,11 +208,12 @@ function updateProgressUI(){
 
   const t = $("progressText");
   const bar = $("miniBarFill");
+
   if(t) t.textContent = String(done);
-  if(bar) bar.style.width = `${Math.round((done/6)*100)}%`;
+  if(bar) bar.style.width = `${Math.round((done / 6) * 100)}%`;
 }
 
-/* ========= Accordion premium ========= */
+/* ========= Accordion ========= */
 function bindRegistroAccordion(container){
   if(!container) return;
 
@@ -228,17 +225,11 @@ function bindRegistroAccordion(container){
 
     const toggleRegistro = () => {
       const isOpen = registro.classList.contains("open");
-
       registros.forEach(r => r.classList.remove("open"));
-
-      if(!isOpen){
-        registro.classList.add("open");
-      }
+      if(!isOpen) registro.classList.add("open");
     };
 
-    if(header){
-      header.onclick = toggleRegistro;
-    }
+    if(header) header.onclick = toggleRegistro;
 
     if(lerMaisBtn){
       lerMaisBtn.onclick = (e) => {
@@ -291,7 +282,6 @@ function fillSelect(selectEl, items, labelFn, selectedId){
 /* ========= Comment panel ========= */
 function renderCommentPanel({ type, colName, arrayField, targetSelect, hintEl, formEl, nameEl, textEl, listEl, labelFn }){
   const items = cache[type];
-
   const chosen = fillSelect(targetSelect, items, labelFn, selected[type]);
   selected[type] = chosen;
 
@@ -303,10 +293,10 @@ function renderCommentPanel({ type, colName, arrayField, targetSelect, hintEl, f
   }
 
   if(formEl) [...formEl.elements].forEach(el => el.disabled = !hasItems);
-
   if(!listEl) return;
 
   listEl.innerHTML = "";
+
   if(!hasItems){
     listEl.innerHTML = `<div class="item"><div class="itemBody">Sem registros para comentar ainda.</div></div>`;
     return;
@@ -398,7 +388,8 @@ function renderCommentPanel({ type, colName, arrayField, targetSelect, hintEl, f
         return;
       }
 
-      const next = comments.map((x,i)=> i===idx ? { ...x, comentario: txt, editedAt: Date.now() } : x);
+      const next = comments.map((x, i)=> i === idx ? { ...x, comentario: txt, editedAt: Date.now() } : x);
+
       try{
         await patchArrayField(colName, parent.id, arrayField, next);
         toast("Atualizado.");
@@ -472,12 +463,10 @@ function renderInicio(){
       <div class="registroHeader">
         <div class="registroInfo">
           <div class="registroTitulo">${esc(it.tema)}</div>
-          <div class="registroMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.comments || []).length} comentário(s)</div>
         </div>
         <div class="registroArrow">⌄</div>
       </div>
-
-      <div class="registroPreview">${esc(it.texto)}</div>
 
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
@@ -487,7 +476,6 @@ function renderInicio(){
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
-
         <div class="itemActions">
           <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
           <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
@@ -501,7 +489,7 @@ function renderInicio(){
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
       const id = btn.getAttribute("data-edit");
-      const it = cache.inicio.find(x=> x.id === id);
+      const it = cache.inicio.find(x => x.id === id);
       if(!it) return;
       $("inicioData").value = it.date || isoToday();
       $("inicioTema").value = it.tema || "";
@@ -603,12 +591,10 @@ function renderEvangelho(){
       <div class="registroHeader">
         <div class="registroInfo">
           <div class="registroTitulo">${esc(it.ref ? `Evangelho — ${it.ref}` : "Evangelho")}</div>
-          <div class="registroMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.comments || []).length} comentário(s)</div>
         </div>
         <div class="registroArrow">⌄</div>
       </div>
-
-      <div class="registroPreview">${esc(it.texto)}</div>
 
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
@@ -618,7 +604,6 @@ function renderEvangelho(){
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
-
         <div class="itemActions">
           <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
           <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
@@ -632,7 +617,7 @@ function renderEvangelho(){
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
       const id = btn.getAttribute("data-edit");
-      const it = cache.evangelho.find(x=> x.id === id);
+      const it = cache.evangelho.find(x => x.id === id);
       if(!it) return;
       $("evData").value = it.date || isoToday();
       $("evRef").value = it.ref || "";
@@ -742,8 +727,6 @@ function renderOracao(){
         <div class="registroArrow">⌄</div>
       </div>
 
-      <div class="registroPreview">${esc(it.texto || "(sem detalhes)")}</div>
-
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
           <div class="registroConteudo">${esc(it.texto || "(sem detalhes)")}</div>
@@ -752,7 +735,6 @@ function renderOracao(){
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
-
         <div class="itemActions">
           <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
           <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
@@ -766,7 +748,7 @@ function renderOracao(){
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
       const id = btn.getAttribute("data-edit");
-      const it = cache.oracao.find(x=> x.id === id);
+      const it = cache.oracao.find(x => x.id === id);
       if(!it) return;
       $("orData").value = it.date || isoToday();
       $("orTipo").value = it.tipo || "Pedido";
@@ -860,8 +842,6 @@ function renderSacramentos(){
         <div class="registroArrow">⌄</div>
       </div>
 
-      <div class="registroPreview">${esc(it.texto)}</div>
-
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
           <div class="registroConteudo">${esc(it.texto)}</div>
@@ -870,7 +850,6 @@ function renderSacramentos(){
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
-
         <div class="itemActions">
           <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
           <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
@@ -884,7 +863,7 @@ function renderSacramentos(){
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
       const id = btn.getAttribute("data-edit");
-      const it = cache.sacramentos.find(x=> x.id === id);
+      const it = cache.sacramentos.find(x => x.id === id);
       if(!it) return;
       $("saData").value = it.date || isoToday();
       $("saNome").value = it.nome || "";
@@ -973,12 +952,10 @@ function renderVida(){
       <div class="registroHeader">
         <div class="registroInfo">
           <div class="registroTitulo">${esc(`Desafio — ${it.desafio}`)}</div>
-          <div class="registroMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.comments || []).length} comentário(s)</div>
         </div>
         <div class="registroArrow">⌄</div>
       </div>
-
-      <div class="registroPreview">${esc(`O que afasta: ${it.afasta}\n\nPlano: ${it.plano || "(não definido)"}`)}</div>
 
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
@@ -988,7 +965,6 @@ function renderVida(){
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
-
         <div class="itemActions">
           <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
           <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
@@ -1002,7 +978,7 @@ function renderVida(){
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
       const id = btn.getAttribute("data-edit");
-      const it = cache.vida.find(x=> x.id === id);
+      const it = cache.vida.find(x => x.id === id);
       if(!it) return;
       $("viData").value = it.date || isoToday();
       $("viDesafio").value = it.desafio || "";
@@ -1104,12 +1080,10 @@ function renderMissao(){
       <div class="registroHeader">
         <div class="registroInfo">
           <div class="registroTitulo">${esc(it.pergunta)}</div>
-          <div class="registroMeta">${esc(it.date)} • ${(it.respostas||[]).length} resposta(s)</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.respostas || []).length} resposta(s)</div>
         </div>
         <div class="registroArrow">⌄</div>
       </div>
-
-      <div class="registroPreview">${esc(`Pergunta da missão: ${it.pergunta}`)}</div>
 
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
@@ -1119,7 +1093,6 @@ function renderMissao(){
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
-
         <div class="itemActions">
           <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
           <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
@@ -1133,7 +1106,7 @@ function renderMissao(){
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
       const id = btn.getAttribute("data-edit");
-      const it = cache.missao.find(x=> x.id === id);
+      const it = cache.missao.find(x => x.id === id);
       if(!it) return;
       $("miData").value = it.date || isoToday();
       $("miPergunta").value = it.pergunta || "";
@@ -1182,10 +1155,10 @@ function renderMissaoReplies(){
   }
 
   if(formEl) [...formEl.elements].forEach(el => el.disabled = !hasItems);
-
   if(!listEl) return;
 
   listEl.innerHTML = "";
+
   if(!hasItems){
     listEl.innerHTML = `<div class="item"><div class="itemBody">Sem perguntas ainda.</div></div>`;
     return;
@@ -1277,7 +1250,8 @@ function renderMissaoReplies(){
         return;
       }
 
-      const next = replies.map((x,i)=> i===idx ? { ...x, comentario: txt, editedAt: Date.now() } : x);
+      const next = replies.map((x, i)=> i === idx ? { ...x, comentario: txt, editedAt: Date.now() } : x);
+
       try{
         await patchArrayField(COL.missao, parent.id, "respostas", next);
         toast("Resposta atualizada.");
@@ -1350,43 +1324,40 @@ function renderTurma(){
   const box = $("tuLista");
   if(!box) return;
 
-box.innerHTML = items.length ? items.map(it=> `
-  <div class="registro">
-    <div class="registroHeader">
-      <div class="registroInfo">
-        <div class="registroTitulo">${esc(it.nome)}</div>
-        <div class="registroMeta">Idade: ${esc(it.idade)} • Sacramento: ${esc(it.sacramento)}</div>
+  box.innerHTML = items.length ? items.map(it=> `
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(it.nome)}</div>
+          <div class="registroMeta">Idade: ${esc(it.idade)} • Sacramento: ${esc(it.sacramento)}</div>
+        </div>
+        <div class="registroArrow">⌄</div>
       </div>
-      <div class="registroArrow">⌄</div>
-    </div>
 
-    <div class="registroConteudoWrap">
-      <div class="registroConteudoInner">
-        <div class="registroConteudo">
-Aluno: ${esc(it.nome)}
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">Aluno: ${esc(it.nome)}
 Idade: ${esc(it.idade)}
-Sacramento: ${esc(it.sacramento)}
+Sacramento: ${esc(it.sacramento)}</div>
+        </div>
+      </div>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
         </div>
       </div>
     </div>
-
-    <div class="registroFooter">
-      <button class="registroLerMais" type="button"></button>
-
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
-      </div>
-    </div>
-  </div>
-`).join("") : `<div class="item"><div class="itemBody">Nenhum aluno cadastrado ainda.</div></div>`;
+  `).join("") : `<div class="item"><div class="itemBody">Nenhum aluno cadastrado ainda.</div></div>`;
 
   bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
       const id = btn.getAttribute("data-edit");
-      const it = cache.turma.find(x=> x.id === id);
+      const it = cache.turma.find(x => x.id === id);
       if(!it) return;
       $("tuNome").value = it.nome || "";
       $("tuIdade").value = it.idade ?? "";
@@ -1426,4 +1397,3 @@ if($("pdfBtn")){
 if(!location.hash) location.hash = "#inicio";
 applyNavState();
 subscribeAll();
-

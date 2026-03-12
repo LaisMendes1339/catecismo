@@ -1350,34 +1350,36 @@ function renderTurma(){
   const box = $("tuLista");
   if(!box) return;
 
-  box.innerHTML = items.length ? items.map(it=> `
-    <div class="registro">
-      <div class="registroHeader">
-        <div class="registroInfo">
-          <div class="registroTitulo">${esc(it.nome)}</div>
-          <div class="registroMeta">Idade: ${esc(it.idade)} • Sacramento: ${esc(it.sacramento)}</div>
-        </div>
-        <div class="registroArrow">⌄</div>
+box.innerHTML = items.length ? items.map(it=> `
+  <div class="registro">
+    <div class="registroHeader">
+      <div class="registroInfo">
+        <div class="registroTitulo">${esc(it.nome)}</div>
+        <div class="registroMeta">Idade: ${esc(it.idade)} • Sacramento: ${esc(it.sacramento)}</div>
       </div>
+      <div class="registroArrow">⌄</div>
+    </div>
 
-      <div class="registroPreview">${esc(`Aluno: ${it.nome}\nIdade: ${it.idade}\nSacramento: ${it.sacramento}`)}</div>
-
-      <div class="registroConteudoWrap">
-        <div class="registroConteudoInner">
-          <div class="registroConteudo">${esc(`Aluno: ${it.nome}\nIdade: ${it.idade}\nSacramento: ${it.sacramento}`)}</div>
-        </div>
-      </div>
-
-      <div class="registroFooter">
-        <button class="registroLerMais" type="button"></button>
-
-        <div class="itemActions">
-          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+    <div class="registroConteudoWrap">
+      <div class="registroConteudoInner">
+        <div class="registroConteudo">
+Aluno: ${esc(it.nome)}
+Idade: ${esc(it.idade)}
+Sacramento: ${esc(it.sacramento)}
         </div>
       </div>
     </div>
-  `).join("") : `<div class="item"><div class="itemBody">Nenhum aluno cadastrado ainda.</div></div>`;
+
+    <div class="registroFooter">
+      <button class="registroLerMais" type="button"></button>
+
+      <div class="itemActions">
+        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+      </div>
+    </div>
+  </div>
+`).join("") : `<div class="item"><div class="itemBody">Nenhum aluno cadastrado ainda.</div></div>`;
 
   bindRegistroAccordion(box);
 
@@ -1424,3 +1426,4 @@ if($("pdfBtn")){
 if(!location.hash) location.hash = "#inicio";
 applyNavState();
 subscribeAll();
+

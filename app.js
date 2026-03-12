@@ -1,11 +1,12 @@
 // app.js (module) — versão completa com:
-// ✅ Navegação por hash + :target (tela muda sempre)
+// ✅ Navegação por hash + :target
 // ✅ Firestore realtime (onSnapshot) com status "Online/Erro/Offline"
-// ✅ Toast com erro real (permission-denied etc.)
+// ✅ Toast com erro real
 // ✅ CRUD em todas as abas
 // ✅ Após salvar: limpa formulário e foca no próximo campo
 // ✅ Comentários/Respostas: salva e libera preencher de novo
-// ✅ Exportar PDF (sem export JSON)
+// ✅ Exportar PDF
+// ✅ Registros com accordion premium (preview + ler mais + animação)
 
 import { db } from "./firebase.js";
 import {
@@ -81,7 +82,7 @@ const cache = {
 
 const selected = { inicio:null, evangelho:null, vida:null, missao:null };
 
-/* ========= Navegação (HASH + :target) ========= */
+/* ========= Navegação ========= */
 const navItems = Array.from(document.querySelectorAll("#nav .navItem"));
 const pageTitle = $("pageTitle");
 const pageSubtitle = $("pageSubtitle");
@@ -111,8 +112,8 @@ function applyNavState(){
   if(pageTitle) pageTitle.textContent = title;
   if(pageSubtitle) pageSubtitle.textContent = subtitles[key] || "";
 
-  // ✅ não deixar "inicio" aparecer em outras telas
   document.querySelectorAll(".page").forEach(p => p.classList.remove("isDefault"));
+
   const hasHash = !!location.hash && location.hash.length > 1;
   const targetId = hasHash ? location.hash.replace("#","") : "";
   const targetExists = targetId ? document.getElementById(targetId) : null;
@@ -152,7 +153,7 @@ async function patchArrayField(col, id, fieldName, nextArray){
   await updateDocById(col, id, { [fieldName]: nextArray });
 }
 
-/* ========= Realtime sync + status ========= */
+/* ========= Realtime sync ========= */
 let firstSync = true;
 
 function subscribeAll(){
@@ -215,6 +216,39 @@ function updateProgressUI(){
   if(bar) bar.style.width = `${Math.round((done/6)*100)}%`;
 }
 
+/* ========= Accordion premium ========= */
+function bindRegistroAccordion(container){
+  if(!container) return;
+
+  const registros = container.querySelectorAll(".registro");
+
+  registros.forEach((registro) => {
+    const header = registro.querySelector(".registroHeader");
+    const lerMaisBtn = registro.querySelector(".registroLerMais");
+
+    const toggleRegistro = () => {
+      const isOpen = registro.classList.contains("open");
+
+      registros.forEach(r => r.classList.remove("open"));
+
+      if(!isOpen){
+        registro.classList.add("open");
+      }
+    };
+
+    if(header){
+      header.onclick = toggleRegistro;
+    }
+
+    if(lerMaisBtn){
+      lerMaisBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleRegistro();
+      };
+    }
+  });
+}
+
 /* ========= Router ========= */
 function renderPage(page){
   if(page === "inicio") renderInicio();
@@ -239,6 +273,7 @@ function fillSelect(selectEl, items, labelFn, selectedId){
     selectEl.disabled = true;
     return null;
   }
+
   selectEl.disabled = false;
 
   items.forEach(it=>{
@@ -253,7 +288,7 @@ function fillSelect(selectEl, items, labelFn, selectedId){
   return selectEl.value;
 }
 
-/* ========= Comment panel (salva e libera sempre) ========= */
+/* ========= Comment panel ========= */
 function renderCommentPanel({ type, colName, arrayField, targetSelect, hintEl, formEl, nameEl, textEl, listEl, labelFn }){
   const items = cache[type];
 
@@ -261,7 +296,11 @@ function renderCommentPanel({ type, colName, arrayField, targetSelect, hintEl, f
   selected[type] = chosen;
 
   const hasItems = items.length > 0;
-  if(hintEl) hintEl.textContent = hasItems ? "Escolha o registro e adicione comentários." : "Crie um registro acima para liberar comentários.";
+  if(hintEl){
+    hintEl.textContent = hasItems
+      ? "Escolha o registro e adicione comentários."
+      : "Crie um registro acima para liberar comentários.";
+  }
 
   if(formEl) [...formEl.elements].forEach(el => el.disabled = !hasItems);
 
@@ -309,7 +348,11 @@ function renderCommentPanel({ type, colName, arrayField, targetSelect, hintEl, f
 
       const nome = (nameEl?.value || "").trim();
       const comentario = (textEl?.value || "").trim();
-      if(!nome || !comentario){ toast("Preencha nome e comentário."); return; }
+
+      if(!nome || !comentario){
+        toast("Preencha nome e comentário.");
+        return;
+      }
 
       const next = [...comments, { nome, comentario, createdAt: Date.now() }];
 
@@ -350,7 +393,10 @@ function renderCommentPanel({ type, colName, arrayField, targetSelect, hintEl, f
       if(novo === null) return;
 
       const txt = novo.trim();
-      if(!txt){ toast("Comentário vazio."); return; }
+      if(!txt){
+        toast("Comentário vazio.");
+        return;
+      }
 
       const next = comments.map((x,i)=> i===idx ? { ...x, comentario: txt, editedAt: Date.now() } : x);
       try{
@@ -374,6 +420,7 @@ if($("inicioCancelar")){
     $("inicioData").value = isoToday();
   };
 }
+
 if($("inicioBusca")) $("inicioBusca").addEventListener("input", renderInicio);
 
 if($("formInicio")){
@@ -383,7 +430,11 @@ if($("formInicio")){
     const date = $("inicioData").value;
     const tema = $("inicioTema").value.trim();
     const texto = $("inicioTexto").value.trim();
-    if(!date || !tema || !texto){ toast("Preencha data, tema e texto."); return; }
+
+    if(!date || !tema || !texto){
+      toast("Preencha data, tema e texto.");
+      return;
+    }
 
     const id = $("inicioEditId").value;
 
@@ -397,7 +448,6 @@ if($("formInicio")){
         toast("Aula salva ✅ (Firestore)");
       }
 
-      // ✅ LIMPA SEMPRE
       $("inicioEditId").value = "";
       $("formInicio").reset();
       $("inicioData").value = isoToday();
@@ -418,20 +468,35 @@ function renderInicio(){
   if(!box) return;
 
   box.innerHTML = items.length ? items.map(it=> `
-    <div class="item">
-      <div class="itemTop">
-        <div>
-          <div class="itemTitle">${esc(it.tema)}</div>
-          <div class="itemMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(it.tema)}</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+        </div>
+        <div class="registroArrow">⌄</div>
+      </div>
+
+      <div class="registroPreview">${esc(it.texto)}</div>
+
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">${esc(it.texto)}</div>
         </div>
       </div>
-      <div class="itemBody">${esc(it.texto)}</div>
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+        </div>
       </div>
     </div>
   `).join("") : `<div class="item"><div class="itemBody">Nenhuma aula ainda.</div></div>`;
+
+  bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -478,6 +543,7 @@ function renderInicio(){
 
 /* ========= EVANGELHO ========= */
 if($("evData")) $("evData").value = isoToday();
+
 if($("evCancelar")){
   $("evCancelar").onclick = ()=>{
     $("evEditId").value = "";
@@ -485,6 +551,7 @@ if($("evCancelar")){
     $("evData").value = isoToday();
   };
 }
+
 if($("evBusca")) $("evBusca").addEventListener("input", renderEvangelho);
 
 if($("formEvangelho")){
@@ -494,7 +561,11 @@ if($("formEvangelho")){
     const date = $("evData").value;
     const ref = $("evRef").value.trim();
     const texto = $("evTexto").value.trim();
-    if(!date || !texto){ toast("Preencha data e texto."); return; }
+
+    if(!date || !texto){
+      toast("Preencha data e texto.");
+      return;
+    }
 
     const id = $("evEditId").value;
 
@@ -508,7 +579,6 @@ if($("formEvangelho")){
         toast("Evangelho salvo ✅ (Firestore)");
       }
 
-      // ✅ LIMPA
       $("evEditId").value = "";
       $("formEvangelho").reset();
       $("evData").value = isoToday();
@@ -529,20 +599,35 @@ function renderEvangelho(){
   if(!box) return;
 
   box.innerHTML = items.length ? items.map(it=> `
-    <div class="item">
-      <div class="itemTop">
-        <div>
-          <div class="itemTitle">${esc(it.ref ? `Evangelho — ${it.ref}` : "Evangelho")}</div>
-          <div class="itemMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(it.ref ? `Evangelho — ${it.ref}` : "Evangelho")}</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+        </div>
+        <div class="registroArrow">⌄</div>
+      </div>
+
+      <div class="registroPreview">${esc(it.texto)}</div>
+
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">${esc(it.texto)}</div>
         </div>
       </div>
-      <div class="itemBody">${esc(it.texto)}</div>
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+        </div>
       </div>
     </div>
   `).join("") : `<div class="item"><div class="itemBody">Nenhum evangelho ainda.</div></div>`;
+
+  bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -589,6 +674,7 @@ function renderEvangelho(){
 
 /* ========= ORAÇÃO ========= */
 if($("orData")) $("orData").value = isoToday();
+
 if($("orCancelar")){
   $("orCancelar").onclick = ()=>{
     $("orEditId").value = "";
@@ -597,6 +683,7 @@ if($("orCancelar")){
     $("orTipo").value = "Pedido";
   };
 }
+
 if($("orBusca")) $("orBusca").addEventListener("input", renderOracao);
 
 if($("formOracao")){
@@ -607,7 +694,11 @@ if($("formOracao")){
     const tipo = $("orTipo").value;
     const causa = $("orCausa").value.trim();
     const texto = $("orTexto").value.trim();
-    if(!date || !tipo || !causa){ toast("Preencha data, tipo e causa."); return; }
+
+    if(!date || !tipo || !causa){
+      toast("Preencha data, tipo e causa.");
+      return;
+    }
 
     const id = $("orEditId").value;
 
@@ -621,7 +712,6 @@ if($("formOracao")){
         toast("Oração salva ✅ (Firestore)");
       }
 
-      // ✅ LIMPA
       $("orEditId").value = "";
       $("formOracao").reset();
       $("orData").value = isoToday();
@@ -643,20 +733,35 @@ function renderOracao(){
   if(!box) return;
 
   box.innerHTML = items.length ? items.map(it=> `
-    <div class="item">
-      <div class="itemTop">
-        <div>
-          <div class="itemTitle">${esc(`${it.tipo} — ${it.causa}`)}</div>
-          <div class="itemMeta">${esc(it.date)}</div>
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(`${it.tipo} — ${it.causa}`)}</div>
+          <div class="registroMeta">${esc(it.date)}</div>
+        </div>
+        <div class="registroArrow">⌄</div>
+      </div>
+
+      <div class="registroPreview">${esc(it.texto || "(sem detalhes)")}</div>
+
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">${esc(it.texto || "(sem detalhes)")}</div>
         </div>
       </div>
-      <div class="itemBody">${esc(it.texto || "(sem detalhes)")}</div>
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+        </div>
       </div>
     </div>
   `).join("") : `<div class="item"><div class="itemBody">Nenhuma oração ainda.</div></div>`;
+
+  bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -690,6 +795,7 @@ function renderOracao(){
 
 /* ========= SACRAMENTOS ========= */
 if($("saData")) $("saData").value = isoToday();
+
 if($("saCancelar")){
   $("saCancelar").onclick = ()=>{
     $("saEditId").value = "";
@@ -697,6 +803,7 @@ if($("saCancelar")){
     $("saData").value = isoToday();
   };
 }
+
 if($("saBusca")) $("saBusca").addEventListener("input", renderSacramentos);
 
 if($("formSac")){
@@ -706,7 +813,11 @@ if($("formSac")){
     const date = $("saData").value;
     const nome = $("saNome").value.trim();
     const texto = $("saTexto").value.trim();
-    if(!date || !texto){ toast("Preencha data e reflexão."); return; }
+
+    if(!date || !texto){
+      toast("Preencha data e reflexão.");
+      return;
+    }
 
     const id = $("saEditId").value;
 
@@ -720,7 +831,6 @@ if($("formSac")){
         toast("Salvo ✅ (Firestore)");
       }
 
-      // ✅ LIMPA
       $("saEditId").value = "";
       $("formSac").reset();
       $("saData").value = isoToday();
@@ -741,20 +851,35 @@ function renderSacramentos(){
   if(!box) return;
 
   box.innerHTML = items.length ? items.map(it=> `
-    <div class="item">
-      <div class="itemTop">
-        <div>
-          <div class="itemTitle">${esc(it.nome ? `Sacramento — ${it.nome}` : "Sacramentos")}</div>
-          <div class="itemMeta">${esc(it.date)}</div>
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(it.nome ? `Sacramento — ${it.nome}` : "Sacramentos")}</div>
+          <div class="registroMeta">${esc(it.date)}</div>
+        </div>
+        <div class="registroArrow">⌄</div>
+      </div>
+
+      <div class="registroPreview">${esc(it.texto)}</div>
+
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">${esc(it.texto)}</div>
         </div>
       </div>
-      <div class="itemBody">${esc(it.texto)}</div>
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+        </div>
       </div>
     </div>
   `).join("") : `<div class="item"><div class="itemBody">Nenhum registro ainda.</div></div>`;
+
+  bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -787,6 +912,7 @@ function renderSacramentos(){
 
 /* ========= VIDA ========= */
 if($("viData")) $("viData").value = isoToday();
+
 if($("viCancelar")){
   $("viCancelar").onclick = ()=>{
     $("viEditId").value = "";
@@ -794,6 +920,7 @@ if($("viCancelar")){
     $("viData").value = isoToday();
   };
 }
+
 if($("viBusca")) $("viBusca").addEventListener("input", renderVida);
 
 if($("formVida")){
@@ -804,7 +931,11 @@ if($("formVida")){
     const desafio = $("viDesafio").value.trim();
     const afasta = $("viAfasta").value.trim();
     const plano = $("viPlano").value.trim();
-    if(!date || !desafio || !afasta){ toast("Preencha data, desafio e o que afasta."); return; }
+
+    if(!date || !desafio || !afasta){
+      toast("Preencha data, desafio e o que afasta.");
+      return;
+    }
 
     const id = $("viEditId").value;
 
@@ -818,7 +949,6 @@ if($("formVida")){
         toast("Salvo ✅ (Firestore)");
       }
 
-      // ✅ LIMPA
       $("viEditId").value = "";
       $("formVida").reset();
       $("viData").value = isoToday();
@@ -839,20 +969,35 @@ function renderVida(){
   if(!box) return;
 
   box.innerHTML = items.length ? items.map(it=> `
-    <div class="item">
-      <div class="itemTop">
-        <div>
-          <div class="itemTitle">${esc(`Desafio — ${it.desafio}`)}</div>
-          <div class="itemMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(`Desafio — ${it.desafio}`)}</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.comments||[]).length} comentário(s)</div>
+        </div>
+        <div class="registroArrow">⌄</div>
+      </div>
+
+      <div class="registroPreview">${esc(`O que afasta: ${it.afasta}\n\nPlano: ${it.plano || "(não definido)"}`)}</div>
+
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">${esc(`O que afasta: ${it.afasta}\n\nPlano: ${it.plano || "(não definido)"}`)}</div>
         </div>
       </div>
-      <div class="itemBody">${esc(`O que afasta: ${it.afasta}\n\nPlano: ${it.plano || "(não definido)"}`)}</div>
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+        </div>
       </div>
     </div>
   `).join("") : `<div class="item"><div class="itemBody">Nenhum registro ainda.</div></div>`;
+
+  bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -900,6 +1045,7 @@ function renderVida(){
 
 /* ========= MISSÃO ========= */
 if($("miData")) $("miData").value = isoToday();
+
 if($("miCancelar")){
   $("miCancelar").onclick = ()=>{
     $("miEditId").value = "";
@@ -907,6 +1053,7 @@ if($("miCancelar")){
     $("miData").value = isoToday();
   };
 }
+
 if($("miBusca")) $("miBusca").addEventListener("input", renderMissao);
 
 if($("formMissao")){
@@ -915,7 +1062,11 @@ if($("formMissao")){
 
     const date = $("miData").value;
     const pergunta = $("miPergunta").value.trim();
-    if(!date || !pergunta){ toast("Preencha data e pergunta."); return; }
+
+    if(!date || !pergunta){
+      toast("Preencha data e pergunta.");
+      return;
+    }
 
     const id = $("miEditId").value;
 
@@ -929,7 +1080,6 @@ if($("formMissao")){
         toast("Pergunta salva ✅ (Firestore)");
       }
 
-      // ✅ LIMPA
       $("miEditId").value = "";
       $("formMissao").reset();
       $("miData").value = isoToday();
@@ -950,19 +1100,35 @@ function renderMissao(){
   if(!box) return;
 
   box.innerHTML = items.length ? items.map(it=> `
-    <div class="item">
-      <div class="itemTop">
-        <div>
-          <div class="itemTitle">${esc(it.pergunta)}</div>
-          <div class="itemMeta">${esc(it.date)} • ${(it.respostas||[]).length} resposta(s)</div>
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(it.pergunta)}</div>
+          <div class="registroMeta">${esc(it.date)} • ${(it.respostas||[]).length} resposta(s)</div>
+        </div>
+        <div class="registroArrow">⌄</div>
+      </div>
+
+      <div class="registroPreview">${esc(`Pergunta da missão: ${it.pergunta}`)}</div>
+
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">${esc(`Pergunta da missão: ${it.pergunta}`)}</div>
         </div>
       </div>
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+        </div>
       </div>
     </div>
   `).join("") : `<div class="item"><div class="itemBody">Nenhuma missão ainda.</div></div>`;
+
+  bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -1009,7 +1175,12 @@ function renderMissaoReplies(){
   selected.missao = chosen;
 
   const hasItems = items.length > 0;
-  if(hintEl) hintEl.textContent = hasItems ? "Escolha a pergunta e registre as respostas." : "Crie uma pergunta acima para liberar respostas.";
+  if(hintEl){
+    hintEl.textContent = hasItems
+      ? "Escolha a pergunta e registre as respostas."
+      : "Crie uma pergunta acima para liberar respostas.";
+  }
+
   if(formEl) [...formEl.elements].forEach(el => el.disabled = !hasItems);
 
   if(!listEl) return;
@@ -1056,7 +1227,11 @@ function renderMissaoReplies(){
 
       const nome = (nameEl?.value || "").trim();
       const comentario = (textEl?.value || "").trim();
-      if(!nome || !comentario){ toast("Preencha nome e comentário."); return; }
+
+      if(!nome || !comentario){
+        toast("Preencha nome e comentário.");
+        return;
+      }
 
       const next = [...replies, { nome, comentario, createdAt: Date.now() }];
 
@@ -1097,7 +1272,10 @@ function renderMissaoReplies(){
       if(novo === null) return;
 
       const txt = novo.trim();
-      if(!txt){ toast("Resposta vazia."); return; }
+      if(!txt){
+        toast("Resposta vazia.");
+        return;
+      }
 
       const next = replies.map((x,i)=> i===idx ? { ...x, comentario: txt, editedAt: Date.now() } : x);
       try{
@@ -1118,6 +1296,7 @@ if($("tuCancelar")){
     $("formTurma").reset();
   };
 }
+
 if($("tuBusca")) $("tuBusca").addEventListener("input", renderTurma);
 
 if($("formTurma")){
@@ -1128,9 +1307,18 @@ if($("formTurma")){
     const idade = Number($("tuIdade").value);
     const sacramento = $("tuSacramento").value.trim();
 
-    if(!nome || nome.length < 2){ toast("Nome precisa ter pelo menos 2 letras."); return; }
-    if(!Number.isFinite(idade) || idade <= 0){ toast("Idade inválida."); return; }
-    if(!sacramento){ toast("Preencha o sacramento."); return; }
+    if(!nome || nome.length < 2){
+      toast("Nome precisa ter pelo menos 2 letras.");
+      return;
+    }
+    if(!Number.isFinite(idade) || idade <= 0){
+      toast("Idade inválida.");
+      return;
+    }
+    if(!sacramento){
+      toast("Preencha o sacramento.");
+      return;
+    }
 
     const id = $("tuEditId").value;
 
@@ -1144,7 +1332,6 @@ if($("formTurma")){
         toast("Aluno salvo ✅ (Firestore)");
       }
 
-      // ✅ LIMPA
       $("tuEditId").value = "";
       $("formTurma").reset();
       $("tuNome").focus();
@@ -1164,19 +1351,35 @@ function renderTurma(){
   if(!box) return;
 
   box.innerHTML = items.length ? items.map(it=> `
-    <div class="item">
-      <div class="itemTop">
-        <div>
-          <div class="itemTitle">${esc(it.nome)}</div>
-          <div class="itemMeta">Idade: ${esc(it.idade)} • Sacramento: ${esc(it.sacramento)}</div>
+    <div class="registro">
+      <div class="registroHeader">
+        <div class="registroInfo">
+          <div class="registroTitulo">${esc(it.nome)}</div>
+          <div class="registroMeta">Idade: ${esc(it.idade)} • Sacramento: ${esc(it.sacramento)}</div>
+        </div>
+        <div class="registroArrow">⌄</div>
+      </div>
+
+      <div class="registroPreview">${esc(`Aluno: ${it.nome}\nIdade: ${it.idade}\nSacramento: ${it.sacramento}`)}</div>
+
+      <div class="registroConteudoWrap">
+        <div class="registroConteudoInner">
+          <div class="registroConteudo">${esc(`Aluno: ${it.nome}\nIdade: ${it.idade}\nSacramento: ${it.sacramento}`)}</div>
         </div>
       </div>
-      <div class="itemActions">
-        <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
-        <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+
+      <div class="registroFooter">
+        <button class="registroLerMais" type="button"></button>
+
+        <div class="itemActions">
+          <button class="actionLink" type="button" data-edit="${esc(it.id)}">editar</button>
+          <button class="actionLink danger" type="button" data-del="${esc(it.id)}">excluir</button>
+        </div>
       </div>
     </div>
   `).join("") : `<div class="item"><div class="itemBody">Nenhum aluno cadastrado ainda.</div></div>`;
+
+  bindRegistroAccordion(box);
 
   box.querySelectorAll("[data-edit]").forEach(btn=>{
     btn.onclick = ()=>{

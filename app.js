@@ -470,10 +470,13 @@ function renderPainel(){
   const lastInicio = cache.inicio[0];
   const lastEv = cache.evangelho[0];
   const lastMissao = cache.missao[0];
-  const totalComentarios = cache.inicio.reduce((a,b)=> a + (b.comments?.length || 0), 0)
-    + cache.evangelho.reduce((a,b)=> a + (b.comments?.length || 0), 0)
-    + cache.vida.reduce((a,b)=> a + (b.comments?.length || 0), 0);
-  const totalRespostas = cache.missao.reduce((a,b)=> a + (b.respostas?.length || 0), 0);
+  const totalComentarios =
+    cache.inicio.reduce((a,b)=> a + (b.comments?.length || 0), 0) +
+    cache.evangelho.reduce((a,b)=> a + (b.comments?.length || 0), 0) +
+    cache.vida.reduce((a,b)=> a + (b.comments?.length || 0), 0);
+
+  const totalRespostas =
+    cache.missao.reduce((a,b)=> a + (b.respostas?.length || 0), 0);
 
   resumo.innerHTML = `
     <div class="resumoLinha"><strong>Última aula:</strong> ${lastInicio ? `${esc(lastInicio.tema)} (${formatDateBr(lastInicio.date)})` : "Nenhuma aula registrada."}</div>
@@ -483,14 +486,48 @@ function renderPainel(){
   `;
 
   const latest = [
-    ...cache.inicio.slice(0,1).map(x => ({ title: `Aula — ${x.tema}`, meta: formatDateBr(x.date), text: x.texto })),
-    ...cache.evangelho.slice(0,1).map(x => ({ title: `Evangelho — ${x.ref || "Sem referência"}`, meta: formatDateBr(x.date), text: x.texto })),
-    ...cache.missao.slice(0,1).map(x => ({ title: "Missão da semana", meta: formatDateBr(x.date), text: x.pergunta }))
+    ...cache.inicio.slice(0,1).map(x => ({
+      title: `Aula — ${x.tema}`,
+      meta: formatDateBr(x.date),
+      text: `${x.objetivo ? `Objetivo: ${x.objetivo}\n\n` : ""}${x.texto}`
+    })),
+    ...cache.evangelho.slice(0,1).map(x => ({
+      title: `Evangelho — ${x.ref || "Sem referência"}`,
+      meta: formatDateBr(x.date),
+      text: `${x.frase ? `Frase-chave: ${x.frase}\n\n` : ""}${x.texto}`
+    })),
+    ...cache.missao.slice(0,1).map(x => ({
+      title: "Missão da semana",
+      meta: formatDateBr(x.date),
+      text: `${x.objetivo ? `Objetivo: ${x.objetivo}\n\n` : ""}${x.pergunta}`
+    }))
   ];
 
   ultimos.innerHTML = latest.length
-    ? latest.map(item => `<div class="item"><div class="itemBody"><strong>${esc(item.title)}</strong><br>${esc(item.meta)}<br><br>${esc(item.text)}</div></div>`).join("")
+    ? latest.map(item => `
+      <div class="registro">
+        <div class="registroHeader">
+          <div class="registroInfo">
+            <div class="registroTitulo">${esc(item.title)}</div>
+            <div class="registroMeta">${esc(item.meta)}</div>
+          </div>
+          <div class="registroArrow">⌄</div>
+        </div>
+
+        <div class="registroConteudoWrap">
+          <div class="registroConteudoInner">
+            <div class="registroConteudo">${esc(item.text)}</div>
+          </div>
+        </div>
+
+        <div class="registroFooter">
+          <button class="registroLerMais" type="button"></button>
+        </div>
+      </div>
+    `).join("")
     : `<div class="item"><div class="itemBody">Ainda não há registros para mostrar.</div></div>`;
+
+  bindRegistroAccordion(ultimos);
 }
 
 /* ========= Início ========= */
@@ -1316,3 +1353,4 @@ $("pdfBtn") && ($("pdfBtn").onclick = ()=>{
 if(!location.hash) location.hash = "#painel";
 applyNavState();
 subscribeAll();
+

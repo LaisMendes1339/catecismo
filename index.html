@@ -8,10 +8,8 @@
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-
 <body>
   <div class="app">
-
     <aside class="sidebar">
       <div class="brand">
         <div class="brandMark" aria-hidden="true">⛪</div>
@@ -30,6 +28,14 @@
       </div>
 
       <nav class="nav" id="nav">
+        <a class="navItem" href="#painel" data-page="painel">
+          <span class="navIcon">🕯️</span>
+          <span class="navText">
+            <span class="navTitle">Painel do Encontro</span>
+            <span class="navDesc">Visão geral do dia</span>
+          </span>
+        </a>
+
         <a class="navItem" href="#inicio" data-page="inicio">
           <span class="navIcon">✝️</span>
           <span class="navText">
@@ -81,25 +87,57 @@
         <a class="navItem" href="#turma" data-page="turma">
           <span class="navIcon">👥</span>
           <span class="navText">
-            <span class="navTitle">Turma</span>
-            <span class="navDesc">Alunos + sacramento</span>
+            <span class="navTitle">Catequizandos</span>
+            <span class="navDesc">Cadastro da turma</span>
           </span>
         </a>
       </nav>
 
       <div class="sideFooter">
-        <button class="ghostBtn" id="pdfBtn" type="button" title="Imprimir / Exportar PDF">Exportar PDF</button>
+        <button class="ghostBtn" id="pdfBtn" type="button">Exportar PDF</button>
       </div>
     </aside>
 
     <main class="content">
       <header class="topbar">
         <div>
-          <h1 id="pageTitle">Início da Fé</h1>
-          <p id="pageSubtitle">Registre a aula e comentários dos alunos.</p>
+          <h1 id="pageTitle">Painel do Encontro</h1>
+          <p id="pageSubtitle">Resumo rápido da caminhada catequética.</p>
         </div>
         <div class="topPill" id="syncPill">Sincronizando…</div>
       </header>
+
+      <!-- PAINEL -->
+      <section class="page" id="painel">
+        <div class="statsGrid">
+          <div class="statCard">
+            <div class="statLabel">Aulas registradas</div>
+            <div class="statValue" id="statInicio">0</div>
+          </div>
+          <div class="statCard">
+            <div class="statLabel">Evangelhos</div>
+            <div class="statValue" id="statEvangelho">0</div>
+          </div>
+          <div class="statCard">
+            <div class="statLabel">Missões</div>
+            <div class="statValue" id="statMissao">0</div>
+          </div>
+          <div class="statCard">
+            <div class="statLabel">Catequizandos</div>
+            <div class="statValue" id="statTurma">0</div>
+          </div>
+        </div>
+
+        <div class="card parchment">
+          <h2>Resumo do Encontro</h2>
+          <div id="painelResumo" class="painelResumo"></div>
+        </div>
+
+        <div class="card parchment">
+          <h2>Últimos registros</h2>
+          <div id="painelUltimos" class="list"></div>
+        </div>
+      </section>
 
       <!-- INÍCIO -->
       <section class="page" id="inicio">
@@ -118,7 +156,12 @@
             </div>
 
             <div class="field full">
-              <label>Texto da aula (sem limite)</label>
+              <label>Objetivo da aula</label>
+              <input type="text" id="inicioObjetivo" placeholder="Ex: Apresentar quem é Jesus e despertar interesse pela caminhada." />
+            </div>
+
+            <div class="field full">
+              <label>Texto da aula</label>
               <textarea id="inicioTexto" placeholder="Escreva tudo que foi debatido..." required></textarea>
             </div>
 
@@ -134,7 +177,7 @@
         <div class="card parchment">
           <div class="cardHeader">
             <h2>Registros</h2>
-            <input class="search" id="inicioBusca" placeholder="Buscar por tema ou texto..." />
+            <input class="search" id="inicioBusca" placeholder="Buscar por tema, objetivo ou texto..." />
           </div>
           <div id="inicioLista" class="list"></div>
         </div>
@@ -172,12 +215,17 @@
             </div>
 
             <div class="field">
-              <label>Referência (opcional)</label>
+              <label>Referência</label>
               <input type="text" id="evRef" placeholder="Ex: Jo 4,5-42" />
             </div>
 
             <div class="field full">
-              <label>Texto (sem limite)</label>
+              <label>Frase-chave</label>
+              <input type="text" id="evFrase" placeholder="Ex: Quem tem sede, venha a mim." />
+            </div>
+
+            <div class="field full">
+              <label>Texto</label>
               <textarea id="evTexto" placeholder="Cole o evangelho, escreva a reflexão..." required></textarea>
             </div>
 
@@ -193,7 +241,7 @@
         <div class="card parchment">
           <div class="cardHeader">
             <h2>Registros</h2>
-            <input class="search" id="evBusca" placeholder="Buscar por referência ou texto..." />
+            <input class="search" id="evBusca" placeholder="Buscar por referência, frase ou texto..." />
           </div>
           <div id="evLista" class="list"></div>
         </div>
@@ -235,6 +283,7 @@
               <select id="orTipo" required>
                 <option value="Pedido">Pedido</option>
                 <option value="Agradecimento">Agradecimento</option>
+                <option value="Intercessão">Intercessão</option>
               </select>
             </div>
 
@@ -244,8 +293,8 @@
             </div>
 
             <div class="field full">
-              <label>Detalhes (opcional)</label>
-              <textarea id="orTexto" placeholder="Se quiser, escreva mais detalhes..."></textarea>
+              <label>Detalhes</label>
+              <textarea id="orTexto" placeholder="Escreva a intenção, causa ou agradecimento..."></textarea>
             </div>
 
             <div class="actionsRow full">
@@ -278,12 +327,17 @@
             </div>
 
             <div class="field">
-              <label>Sacramento (opcional)</label>
-              <input type="text" id="saNome" placeholder="Ex: Eucaristia / Confissão" />
+              <label>Sacramento</label>
+              <input type="text" id="saNome" placeholder="Ex: Eucaristia / Confissão / Crisma" />
             </div>
 
             <div class="field full">
-              <label>Reflexão / Compromisso</label>
+              <label>Compromisso da semana</label>
+              <input type="text" id="saCompromisso" placeholder="Ex: Rezar antes das refeições / Participar da missa" />
+            </div>
+
+            <div class="field full">
+              <label>Reflexão</label>
               <textarea id="saTexto" placeholder="O que foi aprendido? Qual compromisso ficou?" required></textarea>
             </div>
 
@@ -299,7 +353,7 @@
         <div class="card parchment">
           <div class="cardHeader">
             <h2>Registros</h2>
-            <input class="search" id="saBusca" placeholder="Buscar por sacramento ou texto..." />
+            <input class="search" id="saBusca" placeholder="Buscar por sacramento, compromisso ou texto..." />
           </div>
           <div id="saLista" class="list"></div>
         </div>
@@ -327,8 +381,8 @@
             </div>
 
             <div class="field full">
-              <label>Plano prático (opcional)</label>
-              <textarea id="viPlano" placeholder="Ex: Vou rezar antes de dormir..."></textarea>
+              <label>Plano prático</label>
+              <textarea id="viPlano" placeholder="Ex: Vou rezar antes de dormir, pedir perdão e ajudar em casa."></textarea>
             </div>
 
             <div class="actionsRow full">
@@ -343,7 +397,7 @@
         <div class="card parchment">
           <div class="cardHeader">
             <h2>Registros</h2>
-            <input class="search" id="viBusca" placeholder="Buscar por desafio ou texto..." />
+            <input class="search" id="viBusca" placeholder="Buscar por desafio, afastamento ou plano..." />
           </div>
           <div id="viLista" class="list"></div>
         </div>
@@ -385,6 +439,11 @@
               <input type="text" id="miPergunta" placeholder="Ex: O que Jesus quer de mim essa semana?" required />
             </div>
 
+            <div class="field full">
+              <label>Objetivo da missão</label>
+              <input type="text" id="miObjetivo" placeholder="Ex: Incentivar uma atitude concreta de amor ao próximo." />
+            </div>
+
             <div class="actionsRow full">
               <button class="btn primary" type="submit">Salvar Pergunta</button>
               <button class="btn subtle" type="button" id="miCancelar">Cancelar</button>
@@ -397,7 +456,7 @@
         <div class="card parchment">
           <div class="cardHeader">
             <h2>Perguntas</h2>
-            <input class="search" id="miBusca" placeholder="Buscar por pergunta..." />
+            <input class="search" id="miBusca" placeholder="Buscar por pergunta ou objetivo..." />
           </div>
           <div id="miLista" class="list"></div>
         </div>
@@ -414,7 +473,7 @@
 
             <form id="miReplyForm" class="commentFormGrid">
               <input id="miAlunoNome" placeholder="Nome do aluno" required />
-              <input id="miAlunoComentario" placeholder="Comentário/Resposta" required />
+              <input id="miAlunoComentario" placeholder="Comentário / resposta" required />
               <button class="btn primary" type="submit">Adicionar</button>
             </form>
 
@@ -426,22 +485,27 @@
       <!-- TURMA -->
       <section class="page" id="turma">
         <div class="card parchment">
-          <h2>Turma</h2>
+          <h2>Catequizandos</h2>
 
           <form id="formTurma" class="formGrid">
             <div class="field">
-              <label>Nome do aluno</label>
+              <label>Nome</label>
               <input type="text" id="tuNome" placeholder="Ex: João Pedro" required />
             </div>
 
             <div class="field">
-              <label>Idade</label>
-              <input type="number" id="tuIdade" min="1" max="120" placeholder="Ex: 12" required />
+              <label>Data de nascimento</label>
+              <input type="date" id="tuNascimento" required />
             </div>
 
-            <div class="field full">
-              <label>Sacramento que vai receber</label>
+            <div class="field">
+              <label>Sacramento</label>
               <input type="text" id="tuSacramento" placeholder="Ex: Primeira Eucaristia / Crisma" required />
+            </div>
+
+            <div class="field">
+              <label>Município</label>
+              <input type="text" id="tuMunicipio" placeholder="Ex: Macapá" required />
             </div>
 
             <div class="actionsRow full">
@@ -455,8 +519,8 @@
 
         <div class="card parchment">
           <div class="cardHeader">
-            <h2>Alunos cadastrados</h2>
-            <input class="search" id="tuBusca" placeholder="Buscar por nome ou sacramento..." />
+            <h2>Cadastros</h2>
+            <input class="search" id="tuBusca" placeholder="Buscar por nome, sacramento ou município..." />
           </div>
           <div id="tuLista" class="list"></div>
         </div>

@@ -1739,3 +1739,50 @@ textarea{
 .registro.open .registroLerMais::after {
   content: "Recolher";
 }
+.registroFooter {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.registroLerMais {
+  width: 34px;
+  height: 34px;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.46));
+  border: 1px solid rgba(109,79,48,.14);
+  position: relative;
+  transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,.06);
+}
+
+.registroLerMais:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.56));
+}
+
+.registroLerMais::before {
+  content: "⌄";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  color: #5b4030;
+  transition: transform .25s ease;
+}
+
+.registro.open .registroLerMais::before {
+  transform: rotate(180deg);
+}
+
+/* remove totalmente o texto antigo */
+.registro .registroLerMais::after,
+.registro.open .registroLerMais::after {
+  content: "";
+}

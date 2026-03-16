@@ -120,6 +120,7 @@ function unlockScroll() {
 function closeEditModal() {
   if (!editModalOverlay) return;
   editModalOverlay.hidden = true;
+  editModalOverlay.onkeydown = null;
   if (editModalBody) editModalBody.innerHTML = "";
   currentEditSaveHandler = null;
   unlockScroll();
@@ -128,6 +129,7 @@ function closeEditModal() {
 function closeConfirmModal() {
   if (!confirmModalOverlay) return;
   confirmModalOverlay.hidden = true;
+  confirmModalOverlay.onkeydown = null;
   currentDeleteConfirmHandler = null;
   unlockScroll();
 }
@@ -144,6 +146,11 @@ function wireModalEvents() {
       await currentEditSaveHandler();
     }
   });
+
+  confirmModalOverlay?.addEventListener("click", (e) => {
+    if (e.target === confirmModalOverlay) closeConfirmModal();
+  });
+}
 
   confirmModalClose?.addEventListener("click", closeConfirmModal);
   confirmModalCancel?.addEventListener("click", closeConfirmModal);
@@ -243,6 +250,25 @@ function openEditFormModal({ title, fields, onSave }) {
 
   const first = fields[0] && $(fields[0].id);
   if (first) setTimeout(() => first.focus(), 40);
+
+  editModalOverlay.onkeydown = async (e) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeEditModal();
+      return;
+    }
+
+    if (e.key === "Enter") {
+      const target = e.target;
+      const isTextarea = target && target.tagName === "TEXTAREA";
+      if (isTextarea) return;
+
+      e.preventDefault();
+      if (typeof currentEditSaveHandler === "function") {
+        await currentEditSaveHandler();
+      }
+    }
+  };
 }
 
 function openTextEditModal({ title, label, value, onSave, placeholder = "" }) {
@@ -267,7 +293,6 @@ function openTextEditModal({ title, label, value, onSave, placeholder = "" }) {
 
 function askDeletePasswordModal(message = "Tem certeza que deseja excluir este registro?") {
   return new Promise((resolve) => {
-    // fallback se modal não existir
     if (!confirmModalOverlay || !confirmModalText) {
       const confirmMsg = confirm(`${message}\n\nClique em OK para continuar.`);
       if (!confirmMsg) return resolve(false);
@@ -284,12 +309,17 @@ function askDeletePasswordModal(message = "Tem certeza que deseja excluir este r
     }
 
     confirmModalText.innerHTML = `
-      ${esc(message)}
+      <div>${esc(message)}</div>
       <div style="margin-top:12px">
         <label for="confirmDeletePassword" style="display:block;margin-bottom:6px;">Senha de exclusão</label>
         <input id="confirmDeletePassword" type="password" placeholder="Digite a senha" />
       </div>
     `;
+
+    const finishFalse = () => {
+      closeConfirmModal();
+      resolve(false);
+    };
 
     currentDeleteConfirmHandler = async () => {
       const passEl = $("confirmDeletePassword");
@@ -310,13 +340,23 @@ function askDeletePasswordModal(message = "Tem certeza que deseja excluir este r
 
     setTimeout(() => $("confirmDeletePassword")?.focus(), 40);
 
-    const cancelAll = () => {
-      closeConfirmModal();
-      resolve(false);
-    };
+    confirmModalClose.onclick = finishFalse;
+    confirmModalCancel.onclick = finishFalse;
 
-    confirmModalClose.onclick = cancelAll;
-    confirmModalCancel.onclick = cancelAll;
+    confirmModalOverlay.onkeydown = async (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        finishFalse();
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (typeof currentDeleteConfirmHandler === "function") {
+          await currentDeleteConfirmHandler();
+        }
+      }
+    };
   });
 }
 
@@ -540,13 +580,36 @@ function bindRegistroAccordion(container) {
     const header = registro.querySelector(".registroHeader");
     const lerMaisBtn = registro.querySelector(".registroLerMais");
 
-    const toggleRegistro = () => {
-      const isOpen = registro.classList.contains("open");
-      registros.forEach((r) => r.classList.remove("open"));
-      if (!isOpen) registro.classList.add("open");
+    const setExpanded = (isOpen) => {
+      registro.classList.toggle("open", isOpen);
+      if (header) header.setAttribute("aria-expanded", String(isOpen));
     };
 
-    if (header) header.onclick = toggleRegistro;
+    const toggleRegistro = () => {
+      const isOpen = registro.classList.contains("open");
+
+      registros.forEach((r) => {
+        r.classList.remove("open");
+        const h = r.querySelector(".registroHeader");
+        if (h) h.setAttribute("aria-expanded", "false");
+      });
+
+      if (!isOpen) {
+        setExpanded(true);
+      }
+    };
+
+    if (header) {
+      header.onclick = toggleRegistro;
+
+      header.onkeydown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleRegistro();
+        }
+      };
+    }
+
     if (lerMaisBtn) {
       lerMaisBtn.onclick = (e) => {
         e.stopPropagation();

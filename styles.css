@@ -1704,3 +1704,38 @@ textarea{
     display:none;
   }
 }
+.registroHeader {
+  cursor: pointer;
+}
+
+.registroConteudoWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .28s ease, margin-top .2s ease;
+  margin-top: 0;
+}
+
+.registro.open .registroConteudoWrap {
+  grid-template-rows: 1fr;
+  margin-top: 12px;
+}
+
+.registroConteudoInner {
+  overflow: hidden;
+}
+
+.registroArrow {
+  transition: transform .25s ease;
+}
+
+.registro.open .registroArrow {
+  transform: rotate(180deg);
+}
+
+.registro .registroLerMais::after {
+  content: "Ler mais";
+}
+
+.registro.open .registroLerMais::after {
+  content: "Recolher";
+}

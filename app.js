@@ -87,6 +87,13 @@ function setSync(text) {
   const pillMobile = $("syncPillMobile");
   if (pillMobile) pillMobile.textContent = text;
 }
+function formatRichText(text) {
+  const safe = esc(text || "");
+  return safe
+    .split(/\n\s*\n/)
+    .map(paragraph => `<p>${paragraph.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
 
 /* =========================================================
    MODAIS
@@ -837,7 +844,7 @@ function buildRegistroCard({ title, meta, content, editId, deleteId }) {
 
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
-          <div class="registroConteudo">${esc(content)}</div>
+         <div class="registroConteudo">${formatRichText(content)}</div>
         </div>
       </div>
 

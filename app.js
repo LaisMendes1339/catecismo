@@ -578,11 +578,11 @@ function bindRegistroAccordion(container) {
 
   registros.forEach((registro) => {
     const header = registro.querySelector(".registroHeader");
-    const lerMaisBtn = registro.querySelector(".registroLerMais");
+    const arrow = registro.querySelector(".registroArrow");
 
     const setExpanded = (isOpen) => {
       registro.classList.toggle("open", isOpen);
-      if (header) header.setAttribute("aria-expanded", String(isOpen));
+      header?.setAttribute("aria-expanded", String(isOpen));
     };
 
     const toggleRegistro = () => {
@@ -600,7 +600,12 @@ function bindRegistroAccordion(container) {
     };
 
     if (header) {
-      header.onclick = toggleRegistro;
+      header.onclick = (e) => {
+        const clickedAction = e.target.closest(".actionBtn");
+        if (clickedAction) return;
+        toggleRegistro();
+      };
+
       header.onkeydown = (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -609,15 +614,15 @@ function bindRegistroAccordion(container) {
       };
     }
 
-    if (lerMaisBtn) {
-      lerMaisBtn.onclick = (e) => {
+    if (arrow) {
+      arrow.onclick = (e) => {
+        e.preventDefault();
         e.stopPropagation();
         toggleRegistro();
       };
     }
   });
 }
-
 /* =========================================================
    RENDER GERAL
 ========================================================= */
@@ -839,21 +844,22 @@ function buildRegistroCard({ title, meta, content, editId, deleteId }) {
           <div class="registroTitulo">${esc(title)}</div>
           <div class="registroMeta">${esc(meta)}</div>
         </div>
-        <div class="registroArrow">⌄</div>
+
+        <button class="registroArrow" type="button" aria-label="Expandir ou recolher">⌄</button>
       </div>
 
       <div class="registroConteudoWrap">
         <div class="registroConteudoInner">
-         <div class="registroConteudo">${formatRichText(content)}</div>
+          <div class="registroConteudo">${formatRichText(content)}</div>
         </div>
       </div>
 
-     <div class="registroFooter">
-  <div class="itemActions">
-    <button class="actionBtn edit" type="button" data-edit="${esc(editId)}">Editar</button>
-    <button class="actionBtn delete" type="button" data-del="${esc(deleteId)}">Excluir</button>
-  </div>
-</div>
+      <div class="registroFooter">
+        <div class="itemActions">
+          <button class="actionBtn edit" type="button" data-edit="${esc(editId)}">Editar</button>
+          <button class="actionBtn delete" type="button" data-del="${esc(deleteId)}">Excluir</button>
+        </div>
+      </div>
     </div>
   `;
 }

@@ -841,13 +841,12 @@ function buildRegistroCard({ title, meta, content, editId, deleteId }) {
         </div>
       </div>
 
-      <div class="registroFooter">
-        <button class="registroLerMais" type="button"></button>
-        <div class="itemActions">
-          <button class="actionBtn edit" type="button" data-edit="${esc(editId)}">Editar</button>
-          <button class="actionBtn delete" type="button" data-del="${esc(deleteId)}">Excluir</button>
-        </div>
-      </div>
+     <div class="registroFooter">
+  <div class="itemActions">
+    <button class="actionBtn edit" type="button" data-edit="${esc(editId)}">Editar</button>
+    <button class="actionBtn delete" type="button" data-del="${esc(deleteId)}">Excluir</button>
+  </div>
+</div>
     </div>
   `;
 }

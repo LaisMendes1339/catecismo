@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Sistema web de gestão catequética paroquial com painel, aulas, evangelho, oração, sacramentos, vida cristã, missão e catequizandos." />
+  <meta name="description" content="Sistema web de gestão catequética paroquial." />
   <meta name="theme-color" content="#1b0d0d" />
   <title>Catequese — Guia do Catecismo</title>
 
@@ -148,11 +148,6 @@
 
             <div class="heroGrid">
               <div class="heroIntro">
-                <div class="heroBadge">
-                  <span class="heroBadgeIcon" aria-hidden="true">✠</span>
-                  <span class="heroBadgeText">Centro Catequético Digital</span>
-                </div>
-
                 <h1 id="pageTitle">Painel do Encontro</h1>
                 <p id="pageSubtitle">Resumo rápido da caminhada catequética.</p>
 
@@ -792,12 +787,12 @@
 
   <footer class="footerFixed">
     <span class="footerCross" aria-hidden="true">✠</span>
-    Versão: R01 - Desenvolvido por Laís Mendes - 2026
+   ✠ Versão: R01 | Desenvolvido por Laís Mendes | 2026 ✠
   </footer>
 
   <!-- MODAL DE EDIÇÃO -->
-  <div class="modalOverlay" id="editModalOverlay" hidden>
-    <div class="modal catequeseModal">
+  <div id="editModalOverlay" class="modalOverlay" hidden>
+    <div class="modal catequeseModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
       <div class="modalHeader">
         <div>
           <div class="modalEyebrow">Edição de registro</div>
@@ -816,8 +811,8 @@
   </div>
 
   <!-- MODAL DE CONFIRMAÇÃO -->
-  <div class="modalOverlay" id="confirmModalOverlay" hidden>
-    <div class="modal catequeseModal catequeseModalSmall">
+  <div id="confirmModalOverlay" class="modalOverlay" hidden>
+    <div class="modal catequeseModal catequeseModalSmall" role="dialog" aria-modal="true" aria-labelledby="confirmModalText">
       <div class="modalHeader">
         <div>
           <div class="modalEyebrow">Confirmação</div>
@@ -829,13 +824,13 @@
       <div class="modalBody">
         <div class="confirmBox">
           <div class="confirmIcon" aria-hidden="true">✠</div>
-          <p id="confirmModalText">Tem certeza que deseja excluir este registro?</p>
+          <div id="confirmModalText">Tem certeza que deseja excluir este registro?</div>
         </div>
       </div>
 
       <div class="modalFooter">
         <button class="btn subtle" id="confirmModalCancel" type="button">Cancelar</button>
-        <button class="btn dangerBtn" id="confirmModalConfirm" type="button">Excluir</button>
+        <button class="dangerBtn" id="confirmModalConfirm" type="button">Excluir</button>
       </div>
     </div>
   </div>

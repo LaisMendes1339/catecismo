@@ -1705,80 +1705,47 @@ textarea{
   }
 }
 .registroHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
   cursor: pointer;
 }
 
-.registroConteudo {
-  line-height: 1.8;
-  color: var(--ink);
-  padding-top: 2px;
-  font-size: 0.98rem;
-  word-break: break-word;
-}
-
-.registroConteudo p {
-  margin: 0 0 14px;
-}
-
-.registroConteudo p:last-child {
-  margin-bottom: 0;
-}
-
 .registroArrow {
-  transition: transform .25s ease;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(236,225,204,.72));
+  border: 1px solid var(--line);
+  color: var(--wine-600);
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .25s ease, background .25s ease;
 }
 
 .registro.open .registroArrow {
   transform: rotate(180deg);
+  background: linear-gradient(180deg, rgba(226,212,185,.76), rgba(244,236,220,.80));
 }
 
-.registro .registroLerMais::after {
-  content: "Ler mais";
-}
-
-.registro.open .registroLerMais::after {
-  content: "Recolher";
-}
-.registroFooter {
-  margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.registroLerMais {
-  width: 34px;
-  height: 34px;
-  border: none;
-  cursor: pointer;
-  border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.46));
-  border: 1px solid rgba(109,79,48,.14);
-  position: relative;
-  transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,.06);
-}
-
-.registroLerMais:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.56));
-}
-
-.registroLerMais::before {
-  content: "⌄";
-  position: absolute;
-  inset: 0;
+.registroConteudoWrap {
   display: grid;
-  place-items: center;
-  font-size: 16px;
-  color: #5b4030;
-  transition: transform .25s ease;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .30s ease, margin-top .20s ease;
+  margin-top: 0;
 }
 
-.registro.open .registroLerMais::before {
-  transform: rotate(180deg);
+.registro.open .registroConteudoWrap {
+  grid-template-rows: 1fr;
+  margin-top: 12px;
+}
+
+.registroConteudoInner {
+  overflow: hidden;
 }
 
 /* remove totalmente o texto antigo */

@@ -772,7 +772,7 @@ function renderCommentPanel({
 function buildRegistroCard({ title, meta, content, editId, deleteId }) {
   return `
     <div class="registro">
-      <div class="registroHeader">
+      <div class="registroHeader" tabindex="0" role="button" aria-expanded="false">
         <div class="registroInfo">
           <div class="registroTitulo">${esc(title)}</div>
           <div class="registroMeta">${esc(meta)}</div>
@@ -788,6 +788,7 @@ function buildRegistroCard({ title, meta, content, editId, deleteId }) {
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
+
         <div class="itemActions">
           <button class="actionBtn edit" type="button" data-edit="${esc(editId)}">Editar</button>
           <button class="actionBtn delete" type="button" data-del="${esc(deleteId)}">Excluir</button>
@@ -796,7 +797,6 @@ function buildRegistroCard({ title, meta, content, editId, deleteId }) {
     </div>
   `;
 }
-
 /* =========================================================
    PAINEL
 ========================================================= */

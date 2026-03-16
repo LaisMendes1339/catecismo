@@ -10,12 +10,12 @@ import {
   orderBy,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 /* =========================================================
    CONFIG
 ========================================================= */
 
 const DELETE_PASSWORD = "061098";
-
 const $ = (id) => document.getElementById(id);
 
 /* =========================================================
@@ -148,19 +148,6 @@ function wireModalEvents() {
 
   confirmModalOverlay?.addEventListener("click", (e) => {
     if (e.target === confirmModalOverlay) closeConfirmModal();
-  });
-}
-
-  confirmModalClose?.addEventListener("click", closeConfirmModal);
-  confirmModalCancel?.addEventListener("click", closeConfirmModal);
-  confirmModalOverlay?.addEventListener("click", (e) => {
-    if (e.target === confirmModalOverlay) closeConfirmModal();
-  });
-
-  confirmModalConfirm?.addEventListener("click", async () => {
-    if (typeof currentDeleteConfirmHandler === "function") {
-      await currentDeleteConfirmHandler();
-    }
   });
 }
 
@@ -341,6 +328,11 @@ function askDeletePasswordModal(message = "Tem certeza que deseja excluir este r
 
     confirmModalClose.onclick = finishFalse;
     confirmModalCancel.onclick = finishFalse;
+    confirmModalConfirm.onclick = async () => {
+      if (typeof currentDeleteConfirmHandler === "function") {
+        await currentDeleteConfirmHandler();
+      }
+    };
 
     confirmModalOverlay.onkeydown = async (e) => {
       if (e.key === "Escape") {
@@ -504,7 +496,7 @@ function subscribeAll() {
   setSync("Sincronizando…");
 
   const keys = Object.keys(COL);
-  let okCount = 0;
+  let firstSuccess = false;
 
   keys.forEach((key) => {
     const qy = query(collection(db, COL[key]), orderBy("createdAt", "desc"));
@@ -516,8 +508,10 @@ function subscribeAll() {
         updateProgressUI();
         renderPainel();
 
-        okCount++;
-        if (okCount >= 1) setSync("Online ✅");
+        if (!firstSuccess) {
+          firstSuccess = true;
+          setSync("Online ✅");
+        }
 
         const current = currentPageKey();
         if (current === key || current === "painel") renderPage(current);
@@ -535,9 +529,9 @@ function subscribeAll() {
     const pill = $("syncPill")?.textContent || "";
     if (pill.includes("Sincronizando")) {
       setSync("Offline/sem acesso 🔴");
-      toast("Sem acesso ao Firestore. Verifique regras e se o Firestore foi criado.");
+      toast("Sem acesso ao Firestore. Verifique regras, criação do banco e console.");
     }
-  }, 4000);
+  }, 5000);
 }
 
 /* =========================================================
@@ -600,7 +594,6 @@ function bindRegistroAccordion(container) {
 
     if (header) {
       header.onclick = toggleRegistro;
-
       header.onkeydown = (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -850,7 +843,6 @@ function buildRegistroCard({ title, meta, content, editId, deleteId }) {
 
       <div class="registroFooter">
         <button class="registroLerMais" type="button"></button>
-
         <div class="itemActions">
           <button class="actionBtn edit" type="button" data-edit="${esc(editId)}">Editar</button>
           <button class="actionBtn delete" type="button" data-del="${esc(deleteId)}">Excluir</button>
@@ -859,6 +851,7 @@ function buildRegistroCard({ title, meta, content, editId, deleteId }) {
     </div>
   `;
 }
+
 /* =========================================================
    PAINEL
 ========================================================= */
@@ -908,7 +901,7 @@ function renderPainel() {
   ultimos.innerHTML = latest.length
     ? latest.map((item) => `
       <div class="registro">
-        <div class="registroHeader">
+        <div class="registroHeader" tabindex="0" role="button" aria-expanded="false">
           <div class="registroInfo">
             <div class="registroTitulo">${esc(item.title)}</div>
             <div class="registroMeta">${esc(item.meta)}</div>

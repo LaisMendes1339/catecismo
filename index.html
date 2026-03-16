@@ -3,534 +3,847 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sistema web de gestão catequética paroquial com painel, aulas, evangelho, oração, sacramentos, vida cristã, missão e catequizandos." />
+  <meta name="theme-color" content="#1b0d0d" />
   <title>Catequese — Guia do Catecismo</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brandMark" aria-hidden="true">⛪</div>
-        <div>
-          <div class="brandTitle">Catequese</div>
-          <div class="brandSub">Jornada da Fé</div>
+  <input type="checkbox" id="navToggle" class="navToggle" aria-hidden="true" />
+
+  <div class="appShell">
+    <header class="mobileBar">
+      <label for="navToggle" class="mobileMenuBtn" aria-label="Abrir menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <div class="mobileBrand">
+        <span class="mobileBrandMark" aria-hidden="true">✠</span>
+        <div class="mobileBrandText">
+          <strong>Catequese</strong>
+          <small>Jornada da Fé</small>
         </div>
       </div>
 
-      <div class="sideBlock">
-        <div class="sideLabel">Progresso</div>
-        <div class="miniBar">
-          <div class="miniBarFill" id="miniBarFill"></div>
-        </div>
-        <div class="sideHint"><span id="progressText">0</span>/6 etapas</div>
-      </div>
+      <div class="mobileSync" id="syncPillMobile">Sincronizando…</div>
+    </header>
 
-      <nav class="nav" id="nav">
-        <a class="navItem" href="#painel" data-page="painel">
-          <span class="navIcon">🕯️</span>
-          <span class="navText">
-            <span class="navTitle">Painel do Encontro</span>
-            <span class="navDesc">Visão geral do dia</span>
-          </span>
-        </a>
+    <label for="navToggle" class="sidebarBackdrop" aria-hidden="true"></label>
 
-        <a class="navItem" href="#inicio" data-page="inicio">
-          <span class="navIcon">✝️</span>
-          <span class="navText">
-            <span class="navTitle">Início da Fé</span>
-            <span class="navDesc">Aula + comentários</span>
-          </span>
-        </a>
+    <div class="app">
+      <aside class="sidebar" aria-label="Navegação principal">
+        <div class="sidebarScroll">
+          <div class="brandWrap">
+            <div class="brandSeal" aria-hidden="true">
+              <div class="sealOuter">
+                <div class="sealInner">✠</div>
+              </div>
+            </div>
 
-        <a class="navItem" href="#evangelho" data-page="evangelho">
-          <span class="navIcon">📖</span>
-          <span class="navText">
-            <span class="navTitle">Evangelho</span>
-            <span class="navDesc">Texto + comentários</span>
-          </span>
-        </a>
+            <div class="brand">
+              <div class="brandMark" aria-hidden="true">⛪</div>
+              <div>
+                <div class="brandTitle">Catequese</div>
+                <div class="brandSub">Jornada da Fé</div>
+              </div>
+            </div>
 
-        <a class="navItem" href="#oracao" data-page="oracao">
-          <span class="navIcon">🙏</span>
-          <span class="navText">
-            <span class="navTitle">Oração</span>
-            <span class="navDesc">Pedidos e graças</span>
-          </span>
-        </a>
-
-        <a class="navItem" href="#sacramentos" data-page="sacramentos">
-          <span class="navIcon">⛪</span>
-          <span class="navText">
-            <span class="navTitle">Sacramentos</span>
-            <span class="navDesc">Vivência e preparo</span>
-          </span>
-        </a>
-
-        <a class="navItem" href="#vida" data-page="vida">
-          <span class="navIcon">🕊️</span>
-          <span class="navText">
-            <span class="navTitle">Vida Cristã</span>
-            <span class="navDesc">Desafios + comentários</span>
-          </span>
-        </a>
-
-        <a class="navItem" href="#missao" data-page="missao">
-          <span class="navIcon">⭐</span>
-          <span class="navText">
-            <span class="navTitle">Missão</span>
-            <span class="navDesc">Perguntas + respostas</span>
-          </span>
-        </a>
-
-        <a class="navItem" href="#turma" data-page="turma">
-          <span class="navIcon">👥</span>
-          <span class="navText">
-            <span class="navTitle">Catequizandos</span>
-            <span class="navDesc">Cadastro da turma</span>
-          </span>
-        </a>
-      </nav>
-
-      <div class="sideFooter">
-        <button class="ghostBtn" id="pdfBtn" type="button">Exportar PDF</button>
-      </div>
-    </aside>
-
-    <main class="content">
-      <header class="topbar">
-        <div>
-          <h1 id="pageTitle">Painel do Encontro</h1>
-          <p id="pageSubtitle">Resumo rápido da caminhada catequética.</p>
-        </div>
-        <div class="topPill" id="syncPill">Sincronizando…</div>
-      </header>
-
-      <!-- PAINEL -->
-      <section class="page" id="painel">
-        <div class="statsGrid">
-          <div class="statCard">
-            <div class="statLabel">Aulas registradas</div>
-            <div class="statValue" id="statInicio">0</div>
+            <div class="brandMotto">
+              Fé, formação e perseverança
+            </div>
           </div>
-          <div class="statCard">
-            <div class="statLabel">Evangelhos</div>
-            <div class="statValue" id="statEvangelho">0</div>
+
+          <div class="sideBlock sideBlockProgress">
+            <div class="sideLabel">Progresso</div>
+            <div class="miniBar" aria-label="Progresso da caminhada">
+              <div class="miniBarFill" id="miniBarFill"></div>
+            </div>
+            <div class="sideHint">
+              <span id="progressText">0</span>/6 etapas
+            </div>
           </div>
-          <div class="statCard">
-            <div class="statLabel">Missões</div>
-            <div class="statValue" id="statMissao">0</div>
+
+          <nav class="nav" id="nav" aria-label="Seções do sistema">
+            <a class="navItem" href="#painel" data-page="painel">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3c1.6 1.5 2.8 3.5 2.8 5.7A4.8 4.8 0 0 1 12 13a4.8 4.8 0 0 1-2.8-4.3C9.2 6.5 10.4 4.5 12 3Z" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M12 13v6M9 20h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Painel do Encontro</span>
+                <span class="navDesc">Visão geral do dia</span>
+              </span>
+            </a>
+
+            <a class="navItem" href="#inicio" data-page="inicio">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4v16M7 9h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Início da Fé</span>
+                <span class="navDesc">Aula + comentários</span>
+              </span>
+            </a>
+
+            <a class="navItem" href="#evangelho" data-page="evangelho">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M6 5.5A2.5 2.5 0 0 1 8.5 3H20v15.5A2.5 2.5 0 0 0 17.5 16H6V5.5Z" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M6 16v2a3 3 0 0 0 3 3h10" stroke="currentColor" stroke-width="1.6"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Evangelho</span>
+                <span class="navDesc">Texto + comentários</span>
+              </span>
+            </a>
+
+            <a class="navItem" href="#oracao" data-page="oracao">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M8 12c0-3 1.5-5 4-7 2.5 2 4 4 4 7 0 3-1.8 6-4 6s-4-3-4-6Z" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M12 18v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Oração</span>
+                <span class="navDesc">Pedidos e graças</span>
+              </span>
+            </a>
+
+            <a class="navItem" href="#sacramentos" data-page="sacramentos">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4v16M8 8h8M6 20h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Sacramentos</span>
+                <span class="navDesc">Vivência e preparo</span>
+              </span>
+            </a>
+
+            <a class="navItem" href="#vida" data-page="vida">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 20c-4.5-2.8-7-6-7-9.5A3.5 3.5 0 0 1 8.5 7C10 7 11 7.8 12 9c1-1.2 2-2 3.5-2A3.5 3.5 0 0 1 19 10.5C19 14 16.5 17.2 12 20Z" stroke="currentColor" stroke-width="1.6"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Vida Cristã</span>
+                <span class="navDesc">Desafios + comentários</span>
+              </span>
+            </a>
+
+            <a class="navItem" href="#missao" data-page="missao">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="m12 3 2.5 5.2 5.5.8-4 3.9 1 5.6L12 15.8 7 18.5l1-5.6-4-3.9 5.5-.8L12 3Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Missão</span>
+                <span class="navDesc">Perguntas + respostas</span>
+              </span>
+            </a>
+
+            <a class="navItem" href="#turma" data-page="turma">
+              <span class="navIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.5 19a4.5 4.5 0 0 1 9 0M13 19a3.5 3.5 0 0 1 7 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="navText">
+                <span class="navTitle">Catequizandos</span>
+                <span class="navDesc">Cadastro da turma</span>
+              </span>
+            </a>
+          </nav>
+
+          <div class="sideFooter">
+            <button class="ghostBtn" id="pdfBtn" type="button">Exportar PDF</button>
           </div>
-          <div class="statCard">
-            <div class="statLabel">Catequizandos</div>
-            <div class="statValue" id="statTurma">0</div>
+        </div>
+      </aside>
+
+      <main class="content" role="main">
+        <header class="topbar">
+          <div class="heroPanel">
+            <div class="heroOrnament heroOrnamentTop" aria-hidden="true"></div>
+
+            <div class="heroGrid">
+              <div class="heroIntro">
+                <div class="heroBadge">
+                  <span class="heroBadgeIcon" aria-hidden="true">✠</span>
+                  <span class="heroBadgeText">Centro Catequético Digital</span>
+                </div>
+
+                <h1 id="pageTitle">Painel do Encontro</h1>
+                <p id="pageSubtitle">Resumo rápido da caminhada catequética.</p>
+
+                <div class="heroMeta">
+                  <span class="heroMetaItem">Fé</span>
+                  <span class="heroMetaDot" aria-hidden="true"></span>
+                  <span class="heroMetaItem">Formação</span>
+                  <span class="heroMetaDot" aria-hidden="true"></span>
+                  <span class="heroMetaItem">Presença</span>
+                </div>
+              </div>
+
+              <div class="heroSealBlock" aria-hidden="true">
+                <div class="heroSeal">
+                  <div class="heroSealRing"></div>
+                  <div class="heroSealCore">✠</div>
+                </div>
+                <div class="heroSealText">Jornada da Fé</div>
+              </div>
+            </div>
+
+            <div class="heroOrnament heroOrnamentBottom" aria-hidden="true"></div>
           </div>
-        </div>
 
-        <div class="card parchment">
-          <h2>Resumo do Encontro</h2>
-          <div id="painelResumo" class="painelResumo"></div>
-        </div>
+          <div class="topPill" id="syncPill" aria-live="polite">Sincronizando…</div>
+        </header>
 
-        <div class="card parchment">
-          <h2>Últimos registros</h2>
-          <div id="painelUltimos" class="list"></div>
-        </div>
-      </section>
-
-      <!-- INÍCIO -->
-      <section class="page" id="inicio">
-        <div class="card parchment">
-          <h2>Registrar Aula</h2>
-
-          <form id="formInicio" class="formGrid">
-            <div class="field">
-              <label>Data da aula</label>
-              <input type="date" id="inicioData" required />
+        <!-- PAINEL -->
+        <section class="page isDefault" id="painel" aria-labelledby="pageTitle">
+          <div class="statsGrid">
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statIcon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M6 5.5A2.5 2.5 0 0 1 8.5 3H20v15.5A2.5 2.5 0 0 0 17.5 16H6V5.5Z" stroke="currentColor" stroke-width="1.6"/>
+                    <path d="M6 16v2a3 3 0 0 0 3 3h10" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                </div>
+                <div class="statLabel">Aulas registradas</div>
+              </div>
+              <div class="statValue" id="statInicio">0</div>
             </div>
 
-            <div class="field">
-              <label>Tema</label>
-              <input type="text" id="inicioTema" placeholder="Ex: Acolhida / início das aulas" required />
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statIcon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 4v16M7 9h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="statLabel">Evangelhos</div>
+              </div>
+              <div class="statValue" id="statEvangelho">0</div>
             </div>
 
-            <div class="field full">
-              <label>Objetivo da aula</label>
-              <input type="text" id="inicioObjetivo" placeholder="Ex: Apresentar quem é Jesus e despertar interesse pela caminhada." />
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statIcon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m12 3 2.5 5.2 5.5.8-4 3.9 1 5.6L12 15.8 7 18.5l1-5.6-4-3.9 5.5-.8L12 3Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="statLabel">Missões</div>
+              </div>
+              <div class="statValue" id="statMissao">0</div>
             </div>
 
-            <div class="field full">
-              <label>Texto da aula</label>
-              <textarea id="inicioTexto" placeholder="Escreva tudo que foi debatido..." required></textarea>
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statIcon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM16.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.5 19a4.5 4.5 0 0 1 9 0M13 19a3.5 3.5 0 0 1 7 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="statLabel">Catequizandos</div>
+              </div>
+              <div class="statValue" id="statTurma">0</div>
             </div>
-
-            <div class="actionsRow full">
-              <button class="btn primary" type="submit">Salvar</button>
-              <button class="btn subtle" type="button" id="inicioCancelar">Cancelar</button>
-            </div>
-
-            <input type="hidden" id="inicioEditId" />
-          </form>
-        </div>
-
-        <div class="card parchment">
-          <div class="cardHeader">
-            <h2>Registros</h2>
-            <input class="search" id="inicioBusca" placeholder="Buscar por tema, objetivo ou texto..." />
           </div>
-          <div id="inicioLista" class="list"></div>
-        </div>
 
-        <div class="card parchment">
-          <h2>Comentários dos alunos</h2>
-          <div class="hint" id="inicioCommentHint"></div>
-
-          <div class="commentPanel">
-            <div class="field">
-              <label>Escolha a aula</label>
-              <select id="inicioCommentTarget"></select>
+          <div class="dashboardColumns">
+            <div class="card parchment liturgicalCard">
+              <div class="cardHeader cardHeaderDecorated">
+                <div>
+                  <h2>Resumo do Encontro</h2>
+                  <div class="hint">Panorama espiritual e organizacional da caminhada.</div>
+                </div>
+                <span class="cardMark" aria-hidden="true">✠</span>
+              </div>
+              <div id="painelResumo" class="painelResumo"></div>
             </div>
 
-            <form id="inicioCommentForm" class="commentFormGrid">
-              <input id="inicioAlunoNome" placeholder="Nome do aluno" required />
-              <input id="inicioAlunoComentario" placeholder="Comentário do que achou da aula" required />
-              <button class="btn primary" type="submit">Adicionar</button>
+            <div class="dashboardSideCards">
+              <div class="card parchment miniFeatureCard">
+                <div class="miniFeatureIcon" aria-hidden="true">🕯️</div>
+                <div class="miniFeatureContent">
+                  <h3>Presença e missão</h3>
+                  <p>Acompanhe a jornada da turma com clareza e reverência.</p>
+                </div>
+              </div>
+
+              <div class="card parchment miniFeatureCard">
+                <div class="miniFeatureIcon" aria-hidden="true">📜</div>
+                <div class="miniFeatureContent">
+                  <h3>Memória catequética</h3>
+                  <p>Cada registro fortalece a caminhada e dá sentido ao encontro.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Últimos registros</h2>
+                <div class="hint">Movimentos recentes da catequese e interações da turma.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+            <div id="painelUltimos" class="list"></div>
+          </div>
+        </section>
+
+        <!-- INÍCIO -->
+        <section class="page" id="inicio">
+          <div class="sectionBanner">
+            <div class="sectionBannerMark" aria-hidden="true">✠</div>
+            <div>
+              <h2 class="sectionBannerTitle">Início da Fé</h2>
+              <p class="sectionBannerText">Registre a aula, organize o conteúdo e acolha os comentários dos alunos.</p>
+            </div>
+          </div>
+
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Registrar Aula</h2>
+                <div class="hint">Inscreva a data, o tema e o conteúdo partilhado no encontro.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+
+            <form id="formInicio" class="formGrid" autocomplete="off">
+              <div class="field">
+                <label for="inicioData">Data da aula</label>
+                <input type="date" id="inicioData" required />
+              </div>
+
+              <div class="field">
+                <label for="inicioTema">Tema</label>
+                <input type="text" id="inicioTema" placeholder="Ex: Acolhida / início das aulas" required />
+              </div>
+
+              <div class="field full">
+                <label for="inicioObjetivo">Objetivo da aula</label>
+                <input type="text" id="inicioObjetivo" placeholder="Ex: Apresentar quem é Jesus e despertar interesse pela caminhada." />
+              </div>
+
+              <div class="field full">
+                <label for="inicioTexto">Texto da aula</label>
+                <textarea id="inicioTexto" placeholder="Escreva tudo que foi debatido..." required></textarea>
+              </div>
+
+              <div class="actionsRow full">
+                <button class="btn primary" type="submit">Salvar</button>
+                <button class="btn subtle" type="button" id="inicioCancelar">Cancelar</button>
+              </div>
+
+              <input type="hidden" id="inicioEditId" />
             </form>
-
-            <div id="inicioCommentList" class="commentsList"></div>
           </div>
-        </div>
-      </section>
 
-      <!-- EVANGELHO -->
-      <section class="page" id="evangelho">
-        <div class="card parchment">
-          <h2>Registrar Evangelho / Reflexão</h2>
-
-          <form id="formEvangelho" class="formGrid">
-            <div class="field">
-              <label>Data</label>
-              <input type="date" id="evData" required />
+          <div class="card parchment">
+            <div class="cardHeader">
+              <div>
+                <h2>Registros</h2>
+                <div class="hint">Consulte e localize o conteúdo já registrado.</div>
+              </div>
+              <input class="search" type="search" id="inicioBusca" placeholder="Buscar por tema, objetivo ou texto..." />
             </div>
-
-            <div class="field">
-              <label>Referência</label>
-              <input type="text" id="evRef" placeholder="Ex: Jo 4,5-42" />
-            </div>
-
-            <div class="field full">
-              <label>Frase-chave</label>
-              <input type="text" id="evFrase" placeholder="Ex: Quem tem sede, venha a mim." />
-            </div>
-
-            <div class="field full">
-              <label>Texto</label>
-              <textarea id="evTexto" placeholder="Cole o evangelho, escreva a reflexão..." required></textarea>
-            </div>
-
-            <div class="actionsRow full">
-              <button class="btn primary" type="submit">Salvar</button>
-              <button class="btn subtle" type="button" id="evCancelar">Cancelar</button>
-            </div>
-
-            <input type="hidden" id="evEditId" />
-          </form>
-        </div>
-
-        <div class="card parchment">
-          <div class="cardHeader">
-            <h2>Registros</h2>
-            <input class="search" id="evBusca" placeholder="Buscar por referência, frase ou texto..." />
+            <div id="inicioLista" class="list"></div>
           </div>
-          <div id="evLista" class="list"></div>
-        </div>
 
-        <div class="card parchment">
-          <h2>Comentários dos alunos</h2>
-          <div class="hint" id="evCommentHint"></div>
-
-          <div class="commentPanel">
-            <div class="field">
-              <label>Escolha o registro</label>
-              <select id="evCommentTarget"></select>
+          <div class="card parchment">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Comentários dos alunos</h2>
+                <div class="hint" id="inicioCommentHint"></div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
             </div>
 
-            <form id="evCommentForm" class="commentFormGrid">
-              <input id="evAlunoNome" placeholder="Nome do aluno" required />
-              <input id="evAlunoComentario" placeholder="Comentário sobre o evangelho" required />
-              <button class="btn primary" type="submit">Adicionar</button>
+            <div class="commentPanel">
+              <div class="field">
+                <label for="inicioCommentTarget">Escolha a aula</label>
+                <select id="inicioCommentTarget"></select>
+              </div>
+
+              <form id="inicioCommentForm" class="commentFormGrid" autocomplete="off">
+                <input id="inicioAlunoNome" type="text" placeholder="Nome do aluno" required />
+                <input id="inicioAlunoComentario" type="text" placeholder="Comentário do que achou da aula" required />
+                <button class="btn primary" type="submit">Adicionar</button>
+              </form>
+
+              <div id="inicioCommentList" class="commentsList"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EVANGELHO -->
+        <section class="page" id="evangelho">
+          <div class="sectionBanner">
+            <div class="sectionBannerMark" aria-hidden="true">✠</div>
+            <div>
+              <h2 class="sectionBannerTitle">Evangelho</h2>
+              <p class="sectionBannerText">Guarde a Palavra, registre a reflexão e acolha as respostas da turma.</p>
+            </div>
+          </div>
+
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Registrar Evangelho / Reflexão</h2>
+                <div class="hint">Insira a referência bíblica, a frase-chave e o texto contemplativo.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+
+            <form id="formEvangelho" class="formGrid" autocomplete="off">
+              <div class="field">
+                <label for="evData">Data</label>
+                <input type="date" id="evData" required />
+              </div>
+
+              <div class="field">
+                <label for="evRef">Referência</label>
+                <input type="text" id="evRef" placeholder="Ex: Jo 4,5-42" />
+              </div>
+
+              <div class="field full">
+                <label for="evFrase">Frase-chave</label>
+                <input type="text" id="evFrase" placeholder="Ex: Quem tem sede, venha a mim." />
+              </div>
+
+              <div class="field full">
+                <label for="evTexto">Texto</label>
+                <textarea id="evTexto" placeholder="Cole o evangelho, escreva a reflexão..." required></textarea>
+              </div>
+
+              <div class="actionsRow full">
+                <button class="btn primary" type="submit">Salvar</button>
+                <button class="btn subtle" type="button" id="evCancelar">Cancelar</button>
+              </div>
+
+              <input type="hidden" id="evEditId" />
             </form>
-
-            <div id="evCommentList" class="commentsList"></div>
           </div>
-        </div>
-      </section>
 
-      <!-- ORAÇÃO -->
-      <section class="page" id="oracao">
-        <div class="card parchment">
-          <h2>Pedidos e Agradecimentos</h2>
-
-          <form id="formOracao" class="formGrid">
-            <div class="field">
-              <label>Data</label>
-              <input type="date" id="orData" required />
+          <div class="card parchment">
+            <div class="cardHeader">
+              <div>
+                <h2>Registros</h2>
+                <div class="hint">Consulte a Palavra já compartilhada e suas meditações.</div>
+              </div>
+              <input class="search" type="search" id="evBusca" placeholder="Buscar por referência, frase ou texto..." />
             </div>
-
-            <div class="field">
-              <label>Tipo</label>
-              <select id="orTipo" required>
-                <option value="Pedido">Pedido</option>
-                <option value="Agradecimento">Agradecimento</option>
-                <option value="Intercessão">Intercessão</option>
-              </select>
-            </div>
-
-            <div class="field full">
-              <label>Causa / Intenção</label>
-              <input type="text" id="orCausa" placeholder="Ex: saúde, família, gratidão..." required />
-            </div>
-
-            <div class="field full">
-              <label>Detalhes</label>
-              <textarea id="orTexto" placeholder="Escreva a intenção, causa ou agradecimento..."></textarea>
-            </div>
-
-            <div class="actionsRow full">
-              <button class="btn primary" type="submit">Salvar</button>
-              <button class="btn subtle" type="button" id="orCancelar">Cancelar</button>
-            </div>
-
-            <input type="hidden" id="orEditId" />
-          </form>
-        </div>
-
-        <div class="card parchment">
-          <div class="cardHeader">
-            <h2>Registros</h2>
-            <input class="search" id="orBusca" placeholder="Buscar por causa ou texto..." />
+            <div id="evLista" class="list"></div>
           </div>
-          <div id="orLista" class="list"></div>
-        </div>
-      </section>
 
-      <!-- SACRAMENTOS -->
-      <section class="page" id="sacramentos">
-        <div class="card parchment">
-          <h2>Sacramentos</h2>
-
-          <form id="formSac" class="formGrid">
-            <div class="field">
-              <label>Data</label>
-              <input type="date" id="saData" required />
+          <div class="card parchment">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Comentários dos alunos</h2>
+                <div class="hint" id="evCommentHint"></div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
             </div>
 
-            <div class="field">
-              <label>Sacramento</label>
-              <input type="text" id="saNome" placeholder="Ex: Eucaristia / Confissão / Crisma" />
+            <div class="commentPanel">
+              <div class="field">
+                <label for="evCommentTarget">Escolha o registro</label>
+                <select id="evCommentTarget"></select>
+              </div>
+
+              <form id="evCommentForm" class="commentFormGrid" autocomplete="off">
+                <input id="evAlunoNome" type="text" placeholder="Nome do aluno" required />
+                <input id="evAlunoComentario" type="text" placeholder="Comentário sobre o evangelho" required />
+                <button class="btn primary" type="submit">Adicionar</button>
+              </form>
+
+              <div id="evCommentList" class="commentsList"></div>
             </div>
-
-            <div class="field full">
-              <label>Compromisso da semana</label>
-              <input type="text" id="saCompromisso" placeholder="Ex: Rezar antes das refeições / Participar da missa" />
-            </div>
-
-            <div class="field full">
-              <label>Reflexão</label>
-              <textarea id="saTexto" placeholder="O que foi aprendido? Qual compromisso ficou?" required></textarea>
-            </div>
-
-            <div class="actionsRow full">
-              <button class="btn primary" type="submit">Salvar</button>
-              <button class="btn subtle" type="button" id="saCancelar">Cancelar</button>
-            </div>
-
-            <input type="hidden" id="saEditId" />
-          </form>
-        </div>
-
-        <div class="card parchment">
-          <div class="cardHeader">
-            <h2>Registros</h2>
-            <input class="search" id="saBusca" placeholder="Buscar por sacramento, compromisso ou texto..." />
           </div>
-          <div id="saLista" class="list"></div>
-        </div>
-      </section>
+        </section>
 
-      <!-- VIDA CRISTÃ -->
-      <section class="page" id="vida">
-        <div class="card parchment">
-          <h2>Vida Cristã</h2>
-
-          <form id="formVida" class="formGrid">
-            <div class="field">
-              <label>Data</label>
-              <input type="date" id="viData" required />
+        <!-- ORAÇÃO -->
+        <section class="page" id="oracao">
+          <div class="sectionBanner">
+            <div class="sectionBannerMark" aria-hidden="true">✠</div>
+            <div>
+              <h2 class="sectionBannerTitle">Oração</h2>
+              <p class="sectionBannerText">Reúna pedidos, agradecimentos e intenções com acolhimento e reverência.</p>
             </div>
-
-            <div class="field full">
-              <label>Desafio da semana</label>
-              <input type="text" id="viDesafio" placeholder="Ex: rezar 5 min por dia / ajudar alguém" required />
-            </div>
-
-            <div class="field full">
-              <label>O que ainda me afasta de Deus?</label>
-              <textarea id="viAfasta" placeholder="Ex: preguiça, mágoa..." required></textarea>
-            </div>
-
-            <div class="field full">
-              <label>Plano prático</label>
-              <textarea id="viPlano" placeholder="Ex: Vou rezar antes de dormir, pedir perdão e ajudar em casa."></textarea>
-            </div>
-
-            <div class="actionsRow full">
-              <button class="btn primary" type="submit">Salvar</button>
-              <button class="btn subtle" type="button" id="viCancelar">Cancelar</button>
-            </div>
-
-            <input type="hidden" id="viEditId" />
-          </form>
-        </div>
-
-        <div class="card parchment">
-          <div class="cardHeader">
-            <h2>Registros</h2>
-            <input class="search" id="viBusca" placeholder="Buscar por desafio, afastamento ou plano..." />
           </div>
-          <div id="viLista" class="list"></div>
-        </div>
 
-        <div class="card parchment">
-          <h2>Comentários dos alunos</h2>
-          <div class="hint" id="viCommentHint"></div>
-
-          <div class="commentPanel">
-            <div class="field">
-              <label>Escolha o registro</label>
-              <select id="viCommentTarget"></select>
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Pedidos e Agradecimentos</h2>
+                <div class="hint">Registre a intenção e preserve a memória espiritual da turma.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
             </div>
 
-            <form id="viCommentForm" class="commentFormGrid">
-              <input id="viAlunoNome" placeholder="Nome do aluno" required />
-              <input id="viAlunoComentario" placeholder="Comentário sobre a vida cristã" required />
-              <button class="btn primary" type="submit">Adicionar</button>
+            <form id="formOracao" class="formGrid" autocomplete="off">
+              <div class="field">
+                <label for="orData">Data</label>
+                <input type="date" id="orData" required />
+              </div>
+
+              <div class="field">
+                <label for="orTipo">Tipo</label>
+                <select id="orTipo" required>
+                  <option value="Pedido">Pedido</option>
+                  <option value="Agradecimento">Agradecimento</option>
+                  <option value="Intercessão">Intercessão</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label for="orCausa">Causa / Intenção</label>
+                <input type="text" id="orCausa" placeholder="Ex: saúde, família, gratidão..." required />
+              </div>
+
+              <div class="field full">
+                <label for="orTexto">Detalhes</label>
+                <textarea id="orTexto" placeholder="Escreva a intenção, causa ou agradecimento..."></textarea>
+              </div>
+
+              <div class="actionsRow full">
+                <button class="btn primary" type="submit">Salvar</button>
+                <button class="btn subtle" type="button" id="orCancelar">Cancelar</button>
+              </div>
+
+              <input type="hidden" id="orEditId" />
             </form>
-
-            <div id="viCommentList" class="commentsList"></div>
           </div>
-        </div>
-      </section>
 
-      <!-- MISSÃO -->
-      <section class="page" id="missao">
-        <div class="card parchment">
-          <h2>Missão da Semana</h2>
-
-          <form id="formMissao" class="formGrid">
-            <div class="field">
-              <label>Data</label>
-              <input type="date" id="miData" required />
+          <div class="card parchment">
+            <div class="cardHeader">
+              <div>
+                <h2>Registros</h2>
+                <div class="hint">Busque intenções por causa, tipo ou detalhes.</div>
+              </div>
+              <input class="search" type="search" id="orBusca" placeholder="Buscar por causa ou texto..." />
             </div>
-
-            <div class="field full">
-              <label>Pergunta</label>
-              <input type="text" id="miPergunta" placeholder="Ex: O que Jesus quer de mim essa semana?" required />
-            </div>
-
-            <div class="field full">
-              <label>Objetivo da missão</label>
-              <input type="text" id="miObjetivo" placeholder="Ex: Incentivar uma atitude concreta de amor ao próximo." />
-            </div>
-
-            <div class="actionsRow full">
-              <button class="btn primary" type="submit">Salvar Pergunta</button>
-              <button class="btn subtle" type="button" id="miCancelar">Cancelar</button>
-            </div>
-
-            <input type="hidden" id="miEditId" />
-          </form>
-        </div>
-
-        <div class="card parchment">
-          <div class="cardHeader">
-            <h2>Perguntas</h2>
-            <input class="search" id="miBusca" placeholder="Buscar por pergunta ou objetivo..." />
+            <div id="orLista" class="list"></div>
           </div>
-          <div id="miLista" class="list"></div>
-        </div>
+        </section>
 
-        <div class="card parchment">
-          <h2>Respostas dos alunos</h2>
-          <div class="hint" id="miReplyHint"></div>
+        <!-- SACRAMENTOS -->
+        <section class="page" id="sacramentos">
+          <div class="sectionBanner">
+            <div class="sectionBannerMark" aria-hidden="true">✠</div>
+            <div>
+              <h2 class="sectionBannerTitle">Sacramentos</h2>
+              <p class="sectionBannerText">Acompanhe o preparo, o compromisso semanal e a reflexão espiritual.</p>
+            </div>
+          </div>
 
-          <div class="commentPanel">
-            <div class="field">
-              <label>Escolha a pergunta</label>
-              <select id="miReplyTarget"></select>
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Sacramentos</h2>
+                <div class="hint">Mantenha viva a memória do preparo sacramental e dos compromissos assumidos.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
             </div>
 
-            <form id="miReplyForm" class="commentFormGrid">
-              <input id="miAlunoNome" placeholder="Nome do aluno" required />
-              <input id="miAlunoComentario" placeholder="Comentário / resposta" required />
-              <button class="btn primary" type="submit">Adicionar</button>
+            <form id="formSac" class="formGrid" autocomplete="off">
+              <div class="field">
+                <label for="saData">Data</label>
+                <input type="date" id="saData" required />
+              </div>
+
+              <div class="field">
+                <label for="saNome">Sacramento</label>
+                <input type="text" id="saNome" placeholder="Ex: Eucaristia / Confissão / Crisma" />
+              </div>
+
+              <div class="field full">
+                <label for="saCompromisso">Compromisso da semana</label>
+                <input type="text" id="saCompromisso" placeholder="Ex: Rezar antes das refeições / Participar da missa" />
+              </div>
+
+              <div class="field full">
+                <label for="saTexto">Reflexão</label>
+                <textarea id="saTexto" placeholder="O que foi aprendido? Qual compromisso ficou?" required></textarea>
+              </div>
+
+              <div class="actionsRow full">
+                <button class="btn primary" type="submit">Salvar</button>
+                <button class="btn subtle" type="button" id="saCancelar">Cancelar</button>
+              </div>
+
+              <input type="hidden" id="saEditId" />
             </form>
-
-            <div id="miReplyList" class="commentsList"></div>
           </div>
-        </div>
-      </section>
 
-      <!-- TURMA -->
-      <section class="page" id="turma">
-        <div class="card parchment">
-          <h2>Catequizandos</h2>
-
-          <form id="formTurma" class="formGrid">
-            <div class="field">
-              <label>Nome</label>
-              <input type="text" id="tuNome" placeholder="Ex: João Pedro" required />
+          <div class="card parchment">
+            <div class="cardHeader">
+              <div>
+                <h2>Registros</h2>
+                <div class="hint">Consulte os caminhos sacramentais já registrados.</div>
+              </div>
+              <input class="search" type="search" id="saBusca" placeholder="Buscar por sacramento, compromisso ou texto..." />
             </div>
-
-            <div class="field">
-              <label>Data de nascimento</label>
-              <input type="date" id="tuNascimento" required />
-            </div>
-
-            <div class="field">
-              <label>Sacramento</label>
-              <input type="text" id="tuSacramento" placeholder="Ex: Primeira Eucaristia / Crisma" required />
-            </div>
-
-            <div class="field">
-              <label>Município</label>
-              <input type="text" id="tuMunicipio" placeholder="Ex: Macapá" required />
-            </div>
-
-            <div class="actionsRow full">
-              <button class="btn primary" type="submit">Salvar</button>
-              <button class="btn subtle" type="button" id="tuCancelar">Cancelar</button>
-            </div>
-
-            <input type="hidden" id="tuEditId" />
-          </form>
-        </div>
-
-        <div class="card parchment">
-          <div class="cardHeader">
-            <h2>Cadastros</h2>
-            <input class="search" id="tuBusca" placeholder="Buscar por nome, sacramento ou município..." />
+            <div id="saLista" class="list"></div>
           </div>
-          <div id="tuLista" class="list"></div>
-        </div>
-      </section>
+        </section>
 
-      <div id="toast" class="toast"></div>
-    </main>
+        <!-- VIDA CRISTÃ -->
+        <section class="page" id="vida">
+          <div class="sectionBanner">
+            <div class="sectionBannerMark" aria-hidden="true">✠</div>
+            <div>
+              <h2 class="sectionBannerTitle">Vida Cristã</h2>
+              <p class="sectionBannerText">Registre desafios, reconheça obstáculos e fortaleça o plano de caminhada.</p>
+            </div>
+          </div>
+
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Vida Cristã</h2>
+                <div class="hint">Acompanhe a conversão diária com clareza, honestidade e propósito.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+
+            <form id="formVida" class="formGrid" autocomplete="off">
+              <div class="field">
+                <label for="viData">Data</label>
+                <input type="date" id="viData" required />
+              </div>
+
+              <div class="field full">
+                <label for="viDesafio">Desafio da semana</label>
+                <input type="text" id="viDesafio" placeholder="Ex: rezar 5 min por dia / ajudar alguém" required />
+              </div>
+
+              <div class="field full">
+                <label for="viAfasta">O que ainda me afasta de Deus?</label>
+                <textarea id="viAfasta" placeholder="Ex: preguiça, mágoa..." required></textarea>
+              </div>
+
+              <div class="field full">
+                <label for="viPlano">Plano prático</label>
+                <textarea id="viPlano" placeholder="Ex: Vou rezar antes de dormir, pedir perdão e ajudar em casa."></textarea>
+              </div>
+
+              <div class="actionsRow full">
+                <button class="btn primary" type="submit">Salvar</button>
+                <button class="btn subtle" type="button" id="viCancelar">Cancelar</button>
+              </div>
+
+              <input type="hidden" id="viEditId" />
+            </form>
+          </div>
+
+          <div class="card parchment">
+            <div class="cardHeader">
+              <div>
+                <h2>Registros</h2>
+                <div class="hint">Consulte os desafios, os afastamentos e os planos já inscritos.</div>
+              </div>
+              <input class="search" type="search" id="viBusca" placeholder="Buscar por desafio, afastamento ou plano..." />
+            </div>
+            <div id="viLista" class="list"></div>
+          </div>
+
+          <div class="card parchment">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Comentários dos alunos</h2>
+                <div class="hint" id="viCommentHint"></div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+
+            <div class="commentPanel">
+              <div class="field">
+                <label for="viCommentTarget">Escolha o registro</label>
+                <select id="viCommentTarget"></select>
+              </div>
+
+              <form id="viCommentForm" class="commentFormGrid" autocomplete="off">
+                <input id="viAlunoNome" type="text" placeholder="Nome do aluno" required />
+                <input id="viAlunoComentario" type="text" placeholder="Comentário sobre a vida cristã" required />
+                <button class="btn primary" type="submit">Adicionar</button>
+              </form>
+
+              <div id="viCommentList" class="commentsList"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- MISSÃO -->
+        <section class="page" id="missao">
+          <div class="sectionBanner">
+            <div class="sectionBannerMark" aria-hidden="true">✠</div>
+            <div>
+              <h2 class="sectionBannerTitle">Missão</h2>
+              <p class="sectionBannerText">Transforme a reflexão em atitude concreta e acompanhe a resposta da turma.</p>
+            </div>
+          </div>
+
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Missão da Semana</h2>
+                <div class="hint">Registre a pergunta e o propósito pastoral da missão.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+
+            <form id="formMissao" class="formGrid" autocomplete="off">
+              <div class="field">
+                <label for="miData">Data</label>
+                <input type="date" id="miData" required />
+              </div>
+
+              <div class="field full">
+                <label for="miPergunta">Pergunta</label>
+                <input type="text" id="miPergunta" placeholder="Ex: O que Jesus quer de mim essa semana?" required />
+              </div>
+
+              <div class="field full">
+                <label for="miObjetivo">Objetivo da missão</label>
+                <input type="text" id="miObjetivo" placeholder="Ex: Incentivar uma atitude concreta de amor ao próximo." />
+              </div>
+
+              <div class="actionsRow full">
+                <button class="btn primary" type="submit">Salvar Pergunta</button>
+                <button class="btn subtle" type="button" id="miCancelar">Cancelar</button>
+              </div>
+
+              <input type="hidden" id="miEditId" />
+            </form>
+          </div>
+
+          <div class="card parchment">
+            <div class="cardHeader">
+              <div>
+                <h2>Perguntas</h2>
+                <div class="hint">Consulte e acompanhe as missões já propostas.</div>
+              </div>
+              <input class="search" type="search" id="miBusca" placeholder="Buscar por pergunta ou objetivo..." />
+            </div>
+            <div id="miLista" class="list"></div>
+          </div>
+
+          <div class="card parchment">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Respostas dos alunos</h2>
+                <div class="hint" id="miReplyHint"></div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+
+            <div class="commentPanel">
+              <div class="field">
+                <label for="miReplyTarget">Escolha a pergunta</label>
+                <select id="miReplyTarget"></select>
+              </div>
+
+              <form id="miReplyForm" class="commentFormGrid" autocomplete="off">
+                <input id="miAlunoNome" type="text" placeholder="Nome do aluno" required />
+                <input id="miAlunoComentario" type="text" placeholder="Comentário / resposta" required />
+                <button class="btn primary" type="submit">Adicionar</button>
+              </form>
+
+              <div id="miReplyList" class="commentsList"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TURMA -->
+        <section class="page" id="turma">
+          <div class="sectionBanner">
+            <div class="sectionBannerMark" aria-hidden="true">✠</div>
+            <div>
+              <h2 class="sectionBannerTitle">Catequizandos</h2>
+              <p class="sectionBannerText">Organize a turma, acompanhe a caminhada e preserve a memória do grupo.</p>
+            </div>
+          </div>
+
+          <div class="card parchment liturgicalCard">
+            <div class="cardHeader cardHeaderDecorated">
+              <div>
+                <h2>Catequizandos</h2>
+                <div class="hint">Cadastre a turma e mantenha o acompanhamento bem estruturado.</div>
+              </div>
+              <span class="cardMark" aria-hidden="true">✠</span>
+            </div>
+
+            <form id="formTurma" class="formGrid" autocomplete="off">
+              <div class="field">
+                <label for="tuNome">Nome</label>
+                <input type="text" id="tuNome" placeholder="Ex: João Pedro" required />
+              </div>
+
+              <div class="field">
+                <label for="tuNascimento">Data de nascimento</label>
+                <input type="date" id="tuNascimento" required />
+              </div>
+
+              <div class="field">
+                <label for="tuSacramento">Sacramento</label>
+                <input type="text" id="tuSacramento" placeholder="Ex: Primeira Eucaristia / Crisma" required />
+              </div>
+
+              <div class="field">
+                <label for="tuMunicipio">Município</label>
+                <input type="text" id="tuMunicipio" placeholder="Ex: Macapá" required />
+              </div>
+
+              <div class="actionsRow full">
+                <button class="btn primary" type="submit">Salvar</button>
+                <button class="btn subtle" type="button" id="tuCancelar">Cancelar</button>
+              </div>
+
+              <input type="hidden" id="tuEditId" />
+            </form>
+          </div>
+
+          <div class="card parchment">
+            <div class="cardHeader">
+              <div>
+                <h2>Cadastros</h2>
+                <div class="hint">Busque por nome, sacramento ou município.</div>
+              </div>
+              <input class="search" type="search" id="tuBusca" placeholder="Buscar por nome, sacramento ou município..." />
+            </div>
+            <div id="tuLista" class="list"></div>
+          </div>
+        </section>
+
+        <div id="toast" class="toast" aria-live="polite"></div>
+      </main>
+    </div>
   </div>
 
   <footer class="footerFixed">
+    <span class="footerCross" aria-hidden="true">✠</span>
     Versão: R01 - Desenvolvido por Laís Mendes - 2026
   </footer>
 

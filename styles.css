@@ -1708,20 +1708,20 @@ textarea{
   cursor: pointer;
 }
 
-.registroConteudoWrap {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows .28s ease, margin-top .2s ease;
-  margin-top: 0;
+.registroConteudo {
+  line-height: 1.8;
+  color: var(--ink);
+  padding-top: 2px;
+  font-size: 0.98rem;
+  word-break: break-word;
 }
 
-.registro.open .registroConteudoWrap {
-  grid-template-rows: 1fr;
-  margin-top: 12px;
+.registroConteudo p {
+  margin: 0 0 14px;
 }
 
-.registroConteudoInner {
-  overflow: hidden;
+.registroConteudo p:last-child {
+  margin-bottom: 0;
 }
 
 .registroArrow {
